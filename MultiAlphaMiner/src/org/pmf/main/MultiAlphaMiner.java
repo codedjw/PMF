@@ -3,8 +3,8 @@ package org.pmf.main;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.pmf.alphaminer.AlphaMiner;
 import org.pmf.log.logabstraction.*;
+import org.pmf.tools.alphaminer.AlphaMiner;
 
 public class MultiAlphaMiner {
 
@@ -14,16 +14,19 @@ public class MultiAlphaMiner {
 		log.add("ABCD");
 		log.add("ACBD");
 		log.add("AED");
-//		LogRelations logRelations = new AlphaMinerLogRelationImpl(log);
+		Set<String> log2 = new HashSet<String>();
+		log2.add("ACD");
+		log2.add("BCE");
+		LogRelations logRelations = new AlphaMinerLogRelationImpl(log);
 //		printAllRelations(logRelations);
 		AlphaMiner alpha = new AlphaMiner();
 		try {
-			alpha.doMining(log);
+			alpha.doMiningWithRelation(logRelations);
+			alpha.doMining(log2);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public static void printAllRelations(LogRelations relations) {

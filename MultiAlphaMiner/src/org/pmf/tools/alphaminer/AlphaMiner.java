@@ -1,4 +1,4 @@
-package org.pmf.alphaminer;
+package org.pmf.tools.alphaminer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +25,12 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 			if (logRelations != null) {
 				doMiningPrivateWithRelation(logRelations);
 			}
+		}
+	}
+	
+	public void doMiningWithRelation(LogRelations logRelations) throws InterruptedException, ExecutionException {
+		if (logRelations != null) {
+			doMiningPrivateWithRelation(logRelations);
 		}
 	}
 	
@@ -56,7 +62,7 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		// not checked
 		searcher.startSearch(result);
 		searcher.close();
-		System.out.println(result);
+		System.out.println("tuples to place:"+result);
 	}
 
 	@Override

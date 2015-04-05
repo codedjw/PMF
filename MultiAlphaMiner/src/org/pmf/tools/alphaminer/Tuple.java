@@ -1,4 +1,4 @@
-package org.pmf.alphaminer;
+package org.pmf.tools.alphaminer;
 
 import java.util.HashSet;
 import java.util.Set;
