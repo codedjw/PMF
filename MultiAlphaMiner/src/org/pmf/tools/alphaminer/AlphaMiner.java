@@ -2,13 +2,16 @@ package org.pmf.tools.alphaminer;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 
+import org.pmf.graph.petrinet.*;
 import org.pmf.log.logabstraction.AlphaMinerLogRelationImpl;
 import org.pmf.log.logabstraction.LogRelations;
 import org.pmf.util.Pair;
@@ -19,26 +22,28 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 	private LogRelations relations;
 	private List<String> trans;
 	
-	public void doMining(Set<String> log) throws InterruptedException, ExecutionException {
+	public Petrinet doMining(Set<String> log) throws InterruptedException, ExecutionException {
 		if (log != null && !log.isEmpty()) {
 			LogRelations logRelations = new AlphaMinerLogRelationImpl(log);
 			if (logRelations != null) {
-				doMiningPrivateWithRelation(logRelations);
+				return doMiningPrivateWithRelation(logRelations);
 			}
 		}
+		return null;
 	}
 	
-	public void doMiningWithRelation(LogRelations logRelations) throws InterruptedException, ExecutionException {
+	public Petrinet doMiningWithRelation(LogRelations logRelations) throws InterruptedException, ExecutionException {
 		if (logRelations != null) {
-			doMiningPrivateWithRelation(logRelations);
+			return doMiningPrivateWithRelation(logRelations);
 		}
+		return null;
 	}
 	
-	private void doMiningPrivateWithRelation(LogRelations logRelations) throws InterruptedException, ExecutionException {
+	private Petrinet doMiningPrivateWithRelation(LogRelations logRelations) throws InterruptedException, ExecutionException {
 		// TODO Auto-generated method stub
 		this.relations = logRelations;
 		this.trans = logRelations.getTrans();
-		this.trans.removeAll(this.relations.lengthOneLoops().keySet());
+//		this.trans.removeAll(this.relations.lengthOneLoops().keySet());
 		
 		Stack<Tuple> stack = new Stack<Tuple>();
 		for (Pair<String, String> causal : this.relations.causalRelations().keySet()) {
@@ -62,7 +67,72 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		// not checked
 		searcher.startSearch(result);
 		searcher.close();
-		System.out.println("tuples to place:"+result);
+		
+		System.out.println("tuple2place: "+result);
+		
+		// new Petrinet
+		Petrinet net = PetrinetFactory.newPetrinet("Test for Alpha");
+		
+		// add transitions
+		Map<String, Transition> class2transition = new HashMap<String, Transition>();
+		for (String t : this.trans) {
+			Transition transition = net.addTransition(t);
+			class2transition.put(t, transition);
+		}
+		
+		// add places for each tuple
+		Map<Tuple, Place> tuple2place = new HashMap<Tuple, Place>();
+		int idx = 0;
+		for (Tuple t : result) {
+			Place place = net.addPlace("P"+idx/*+"("+t.toString()+")"*/);
+			idx++;
+			for (String source : t.leftPart) {
+				Transition st = class2transition.get(source);
+				Arc s2p = net.addArc(st, place);
+			}
+			for (String target : t.rightPart) {
+				Transition tt = class2transition.get(target);
+				Arc p2t = net.addArc(place, tt);
+			}
+			tuple2place.put(t, place);
+		}
+		
+		// add initial and end place
+		Place pstart = net.addPlace("Start");
+		Set<String> starts = this.relations.startTraceInfo().keySet();
+		if (starts != null && !starts.isEmpty()) {
+			for (String sc : starts) {
+				Transition st = class2transition.get(sc);
+				Arc pstart2t = net.addArc(pstart, st);
+			}
+		}
+		Place pend = net.addPlace("End");
+		Set<String> ends = this.relations.endTraceInfo().keySet();
+		if (ends != null && !ends.isEmpty()) {
+			for (String ec : ends) {
+				Transition et = class2transition.get(ec);
+				Arc t2pend = net.addArc(et, pend);
+			}
+		}
+		
+		// connect 1-loops http://0agr.ru/wiki/index.php/Alpha_Algorithm
+		// not check
+		Set<String> oneLoops = this.relations.lengthOneLoops().keySet();
+		if (oneLoops != null && !oneLoops.isEmpty()) {
+			for (String oneLoop : oneLoops) {
+				Tuple t = new Tuple(); // one loop place
+				t.leftPart.add(oneLoop);
+				t.rightPart.add(oneLoop);
+				if (!result.contains(t)) {
+					Place tp = net.addPlace("P"+idx/*"one loop with " + oneLoop*/);
+					idx++;
+					net.addArc(class2transition.get(oneLoop), tp);
+					net.addArc(tp, class2transition.get(oneLoop));
+				}
+			}
+		}
+		
+		return net;
 	}
 
 	@Override
