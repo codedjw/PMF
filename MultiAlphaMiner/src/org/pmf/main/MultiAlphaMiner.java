@@ -65,7 +65,6 @@ public class MultiAlphaMiner {
 	
 	public static void printNet(Petrinet net) {
 		if (net != null) {
-			Collection<Transition> transitions = net.getTransitions();
 			Collection<Place> places = net.getPlaces();
 			Place start = null;
 			for (Place place : places) {
@@ -74,10 +73,9 @@ public class MultiAlphaMiner {
 					break;
 				}
 			}
-			Collection<Arc> arcs = net.getArcs();
-			System.out.println("Transitions: "+transitions);
-			System.out.println("Places: "+places);
-			System.out.println("Arcs: ");
+			if (start != null) {
+				net.printPetrinet(start);
+			}
 		}
 	}
 

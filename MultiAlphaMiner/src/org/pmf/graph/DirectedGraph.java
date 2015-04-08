@@ -15,5 +15,8 @@ public interface DirectedGraph<N extends DirectedGraphNode, E extends DirectedGr
 	@SuppressWarnings("unchecked")
 	void removeEdge(DirectedGraphEdge edge);
 	void removeNode(DirectedGraphNode node);
+	
+	void DFS(DirectedGraphTraverseAction action, DirectedGraphNode startNode);
 
+	void BFS(DirectedGraphTraverseAction action, DirectedGraphNode startNode);
 }

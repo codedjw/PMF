@@ -8,6 +8,7 @@ import java.util.Set;
 import org.pmf.graph.DirectedGraph;
 import org.pmf.graph.DirectedGraphEdge;
 import org.pmf.graph.DirectedGraphNode;
+import org.pmf.graph.DirectedGraphTraverseAction;
 import org.pmf.graph.impl.AbstractDirectedGraph;
 import org.pmf.graph.petrinet.Arc;
 import org.pmf.graph.petrinet.Petrinet;
@@ -16,7 +17,7 @@ import org.pmf.graph.petrinet.Transition;
 import org.pmf.util.AttributeMap;
 
 public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> implements
-		Petrinet {
+		Petrinet, DirectedGraphTraverseAction {
 	
 	protected Set<Transition> transitions;
 	protected Set<Place> places;
@@ -184,6 +185,32 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 	public synchronized Collection<Arc> getArcs() {
 		// TODO Auto-generated method stub
 		return this.arcs;
+	}
+
+	@Override
+	public void processNode(DirectedGraphNode node) {
+		// TODO Auto-generated method stub
+		System.out.print(node.getLabel()+" ");
+	}
+
+	@Override
+	public void printPetrinet(PetrinetNode startNode) {
+		System.out.println("Transitions: "+this.transitions);
+		System.out.println("Places: "+this.places);
+		// TODO Auto-generated method stub
+		System.out.println("Arcs: ");
+		this.DFS(this, startNode);
+	}
+
+	@Override
+	public void processNodeWithStringBuffer(DirectedGraphNode node, StringBuffer str) {
+		// TODO Auto-generated method stub
+		str.append(node.getLabel());
+		if (node.getLabel().equals("End")) {
+			System.out.println(str);
+		} else {
+			str.append("-->");
+		}
 	}
 
 }
