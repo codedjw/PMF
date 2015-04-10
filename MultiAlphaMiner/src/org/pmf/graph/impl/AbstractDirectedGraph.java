@@ -156,11 +156,12 @@ public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E exten
 	}
 	
 	private void bfs(DirectedGraphNode node, DirectedGraphTraverseAction action, boolean[] visited, Map<DirectedGraphNode, Integer> nodesIdx) {
-		StringBuffer str = new StringBuffer("");
+//		StringBuffer str = new StringBuffer("");
 		Queue<DirectedGraphNode> queue = new LinkedList<DirectedGraphNode>();
 		queue.offer(node);
 		visited[nodesIdx.get(node)] = true;
-		action.processNodeWithStringBuffer(node, str);
+		action.processNode(node);
+//		action.processNodeWithStringBuffer(node, str);
 		while (!queue.isEmpty()) {
 			DirectedGraphNode source = queue.poll();
 			Collection<E> outEdges = this.getOutEdges(source);
@@ -170,7 +171,7 @@ public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E exten
 					if (!visited[nodesIdx.get(target)]) {
 						queue.offer(target);
 						visited[nodesIdx.get(target)] = true;
-						action.processNodeWithStringBuffer(target, str);
+						action.processNode(target);
 					}
 				}
 			}
@@ -196,16 +197,15 @@ public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E exten
 				}
 			}
 			for (int i=0; i<nodes.length; i++) {
-				StringBuffer str = new StringBuffer("");
 				if (!visited[i]) {
-					this.dfs(nodes[i], action, visited, nodesIdx, str);
+					this.dfs(nodes[i], action, visited, nodesIdx);
 					System.out.println();
 				}
 			}
 		}
 	}
 	
-	private void dfs(DirectedGraphNode node, DirectedGraphTraverseAction action, boolean[] visited, Map<DirectedGraphNode, Integer> nodesIdx, StringBuffer str) {
+	private void dfs(DirectedGraphNode node, DirectedGraphTraverseAction action, boolean[] visited, Map<DirectedGraphNode, Integer> nodesIdx) {
 		visited[nodesIdx.get(node)] = true;
 		action.processNode(node);
 //		action.processNodeWithStringBuffer(node, str);
@@ -214,7 +214,7 @@ public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E exten
 			for (E edge : outEdges) {
 				DirectedGraphNode target = edge.getTarget();
 				if (!visited[nodesIdx.get(target)]) {
-					dfs(target, action, visited, nodesIdx, str);
+					dfs(target, action, visited, nodesIdx);
 				}
 			}
 		}

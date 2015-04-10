@@ -199,7 +199,7 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 		System.out.println("Places: "+this.places);
 		// TODO Auto-generated method stub
 		System.out.println("Arcs: ");
-		this.DFS(this, startNode);
+		this.BFS(this, startNode);
 	}
 
 	@Override
