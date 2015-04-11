@@ -1,11 +1,10 @@
-package org.pmf.graph.petrinet.impl;
+package org.pmf.graph.petrinet;
 
 import java.util.Collection;
 
 import org.pmf.graph.DirectedGraph;
-import org.pmf.graph.petrinet.Arc;
-import org.pmf.graph.petrinet.Place;
-import org.pmf.graph.petrinet.Transition;
+import org.pmf.graph.petrinet.impl.PetrinetEdge;
+import org.pmf.graph.petrinet.impl.PetrinetNode;
 
 public interface PetrinetGraph extends DirectedGraph<PetrinetNode, PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> {
 	

@@ -1,6 +1,5 @@
 package org.pmf.graph.petrinet;
 
-import org.pmf.graph.petrinet.impl.PetrinetGraph;
 import org.pmf.graph.petrinet.impl.PetrinetNode;
 
 public interface Petrinet extends PetrinetGraph {
