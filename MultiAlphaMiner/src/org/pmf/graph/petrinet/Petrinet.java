@@ -7,5 +7,7 @@ public interface Petrinet extends PetrinetGraph {
 	public String toString();
 	
 	public void printPetrinet(PetrinetNode startNode);
+	
+	public void petrinet2SVG(PetrinetNode startNode);
 
 }

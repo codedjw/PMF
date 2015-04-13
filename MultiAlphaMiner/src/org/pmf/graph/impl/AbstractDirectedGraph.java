@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -14,6 +15,7 @@ import org.pmf.graph.DirectedGraph;
 import org.pmf.graph.DirectedGraphEdge;
 import org.pmf.graph.DirectedGraphNode;
 import org.pmf.graph.DirectedGraphTraverseAction;
+import org.pmf.util.Pair;
 
 public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E extends DirectedGraphEdge<? extends N, ? extends N>> extends AbstractGraph
 	implements DirectedGraph<N, E> {
@@ -215,6 +217,69 @@ public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E exten
 				DirectedGraphNode target = edge.getTarget();
 				if (!visited[nodesIdx.get(target)]) {
 					dfs(target, action, visited, nodesIdx);
+				}
+			}
+		}
+	}
+	
+	public void BFSTOSVG(DirectedGraphNode startNode) {
+		if (startNode != null && this.getNodes() != null && !this.getNodes().isEmpty()) {
+			int[] layers = new int[this.getNodes().size()];
+			for (int i=0; i<layers.length; i++) {
+				layers[i] = -1;
+			}
+			DirectedGraphNode[] nodes = new DirectedGraphNode[this.getNodes().size()];
+			Map<DirectedGraphNode, Integer> nodesIdx = new HashMap<DirectedGraphNode, Integer>();
+			Map<DirectedGraphNode, Map<Integer, List<DirectedGraphNode>>> graphList = new HashMap<DirectedGraphNode, Map<Integer, List<DirectedGraphNode>>>();
+			// fill nodes
+			int idx = 1;
+			for (DirectedGraphNode node : this.getNodes()) {
+				if (startNode.equals(node)) {
+					nodes[0] = node;
+					nodesIdx.put(node, 0);
+				} else {
+					nodes[idx] = node;
+					nodesIdx.put(node, idx);
+					idx++;
+				}
+			}
+			for (int i=0; i<nodes.length; i++) {
+				if (layers[i] == -1) {
+					Map<Integer, List<DirectedGraphNode>> layermap = new HashMap<Integer, List<DirectedGraphNode>>();
+					this.bfsToSvg(nodes[i], layers, nodesIdx, layermap);
+					graphList.put(nodes[i], layermap);
+				}
+			}
+			System.out.println("==========");
+			System.out.println(graphList);
+//			Map<DirectedGraphNode, Pair<Integer,Integer>> nodexy = new HashMap<DirectedGraphNode, Pair<Integer,Integer>>();
+		}
+	}
+	
+	private void bfsToSvg(DirectedGraphNode node, int[] layers, Map<DirectedGraphNode, Integer> nodesIdx, Map<Integer, List<DirectedGraphNode>> layermap) {
+		Queue<DirectedGraphNode> queue = new LinkedList<DirectedGraphNode>();
+		queue.offer(node);
+		layers[nodesIdx.get(node)] = 0;
+		List<DirectedGraphNode> layer0List = (layermap.get(0) != null) ? layermap.get(0) : (new ArrayList<DirectedGraphNode>());
+		layer0List.add(node);
+		layermap.put(0, layer0List);
+		System.out.println("--------");
+		System.out.println(node.getLabel()+" "+layers[nodesIdx.get(node)]);
+		while (!queue.isEmpty()) {
+			DirectedGraphNode source = queue.poll();
+			Collection<E> outEdges = this.getOutEdges(source);
+			if (outEdges != null && !outEdges.isEmpty()) {
+				for (E edge : outEdges) {
+					DirectedGraphNode target = edge.getTarget();
+					if (layers[nodesIdx.get(target)] == -1) {
+						queue.offer(target);
+						layers[nodesIdx.get(target)] = layers[nodesIdx.get(source)]+1;
+						int layer = layers[nodesIdx.get(target)];
+						List<DirectedGraphNode> layerList = (layermap.get(layer) != null) ? layermap.get(layer) : (new ArrayList<DirectedGraphNode>());
+						layerList.add(target);
+						layermap.put(layer, layerList);
+						System.out.println(target.getLabel()+" "+layers[nodesIdx.get(target)]);
+					}
 				}
 			}
 		}

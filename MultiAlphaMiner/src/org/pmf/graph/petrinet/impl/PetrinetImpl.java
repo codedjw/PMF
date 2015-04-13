@@ -213,4 +213,10 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 		}
 	}
 
+	@Override
+	public void petrinet2SVG(PetrinetNode startNode) {
+		// TODO Auto-generated method stub
+		this.BFSTOSVG(startNode);
+	}
+
 }

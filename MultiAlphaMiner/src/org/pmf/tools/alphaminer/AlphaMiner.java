@@ -82,10 +82,10 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		
 		// add places for each tuple
 		Map<Tuple, Place> tuple2place = new HashMap<Tuple, Place>();
-		int idx = 0;
+//		int idx = 0;
 		for (Tuple t : result) {
-			Place place = net.addPlace("P"+idx/*+"("+t.toString()+")"*/);
-			idx++;
+			Place place = net.addPlace(/*"P"+idx+*/"("+t.toString()+")");
+//			idx++;
 			for (String source : t.leftPart) {
 				Transition st = class2transition.get(source);
 				Arc s2p = net.addArc(st, place);
@@ -124,8 +124,8 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 				t.leftPart.add(oneLoop);
 				t.rightPart.add(oneLoop);
 				if (!result.contains(t)) {
-					Place tp = net.addPlace("P"+idx/*"one loop with " + oneLoop*/);
-					idx++;
+					Place tp = net.addPlace(/*"P"+idx*/"one loop with " + oneLoop);
+//					idx++;
 					net.addArc(class2transition.get(oneLoop), tp);
 					net.addArc(tp, class2transition.get(oneLoop));
 				}
