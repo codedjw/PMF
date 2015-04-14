@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.pmf.graph.DirectedGraph;
 import org.pmf.graph.DirectedGraphEdge;
 import org.pmf.graph.DirectedGraphNode;
@@ -211,6 +214,51 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 		} else {
 			str.append("-->");
 		}
+	}
+
+	@Override
+	public JSONObject buildJson() {
+		// TODO Auto-generated method stub
+		JSONObject json = new JSONObject();
+		if (transitions != null && !transitions.isEmpty()) {
+			JSONArray tarray = new JSONArray();
+			for (Transition t : transitions) {
+				JSONObject tjson = new JSONObject();
+				tjson.element("tid", t.getId().toString());
+				tjson.element("label", t.getLabel());
+				tjson.element("type", t.getAttributeMap().get(AttributeMap.TYPE));
+				tarray.add(tjson);
+			}
+			json.element("Transitions", tarray);
+		}
+		if (places != null && !places.isEmpty()) {
+			JSONArray parray = new JSONArray();
+			int idx = 0;
+			for (Place p : places) {
+				JSONObject pjson = new JSONObject();
+				pjson.element("pid", p.getId().toString());
+				if (p.getLabel().equals("Start") || p.getLabel().equals("End")) {
+					pjson.element("label", p.getLabel());
+				} else {
+					pjson.element("label", "P"+idx);
+					idx++;
+				}
+				pjson.element("type", p.getAttributeMap().get(AttributeMap.TYPE));
+				parray.add(pjson);
+			}
+			json.element("Places", parray);
+		}
+		if (arcs != null && !arcs.isEmpty()) {
+			JSONArray arc_array = new JSONArray();
+			for (Arc a : arcs) {
+				JSONObject arc_json = new JSONObject();
+				arc_json.element("start", a.getSource().getId().toString());
+				arc_json.element("target", a.getTarget().getId().toString());
+				arc_array.add(arc_json);
+			}
+			json.element("Arcs", arc_array);
+		}
+		return json;
 	}
 
 }

@@ -14,7 +14,7 @@ public class NodeID implements Comparable<NodeID>, Serializable {
 	}
 
 	public String toString() {
-		return "node " + id;
+		return id.toString();
 	}
 
 	public boolean equals(Object o) {

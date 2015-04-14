@@ -39,12 +39,6 @@ public class Transition extends PetrinetNode {
 		return this.isInvisible;
 	}
 
-	@Override
-	public NodeID getId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Collection<Transition> getVisiblePredecessors() {
 
 		final NodeAcceptor<PetrinetNode> nodeAcceptor = new NodeAcceptor<PetrinetNode>() {

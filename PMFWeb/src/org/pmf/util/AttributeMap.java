@@ -17,7 +17,7 @@ public class AttributeMap {
 	public final static String TYPE = PREFIX + "TYPE";
 	
 	public final static String VISIBILITY = PREFIX + "VISIBILITY";
-
+	
 	private final Map<String, Object> mapping = new LinkedHashMap<String, Object>();
 	
 	public AttributeMap() {

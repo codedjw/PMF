@@ -128,6 +128,54 @@ public abstract class AbstractDirectedGraph<N extends DirectedGraphNode, E exten
 		return id.compareTo(graph.id);
 	}
 	
+	public void BFSTOSVG(DirectedGraphNode startNode) {
+		if (startNode != null && this.getNodes() != null && !this.getNodes().isEmpty()) {
+			int[] parents = new int[this.getNodes().size()];
+			for (int i=0; i<parents.length; i++) {
+				parents[i] = -1;
+			}
+			DirectedGraphNode[] nodes = new DirectedGraphNode[this.getNodes().size()];
+			Map<DirectedGraphNode, Integer> nodesIdx = new HashMap<DirectedGraphNode, Integer>();
+			// fill nodes
+			int idx = 1;
+			for (DirectedGraphNode node : this.getNodes()) {
+				if (startNode.equals(node)) {
+					nodes[0] = node;
+					nodesIdx.put(node, 0);
+				} else {
+					nodes[idx] = node;
+					nodesIdx.put(node, idx);
+					idx++;
+				}
+			}
+			for (int i=0; i<nodes.length; i++) {
+				if (parents[i] == -1) {
+					this.bfsToSvg(nodes[i], parents, nodesIdx);
+					System.out.println();
+				}
+			}
+		}
+	}
+	
+	private void bfsToSvg(DirectedGraphNode node, int[] parents, Map<DirectedGraphNode, Integer> nodesIdx) {
+		Queue<DirectedGraphNode> queue = new LinkedList<DirectedGraphNode>();
+		queue.offer(node);
+		parents[nodesIdx.get(node)] = nodesIdx.get(node);
+		while (!queue.isEmpty()) {
+			DirectedGraphNode source = queue.poll();
+			Collection<E> outEdges = this.getOutEdges(source);
+			if (outEdges != null && !outEdges.isEmpty()) {
+				for (E edge : outEdges) {
+					DirectedGraphNode target = edge.getTarget();
+					if (parents[nodesIdx.get(target)] == -1) {
+						queue.offer(target);
+						parents[nodesIdx.get(target)] = parents[nodesIdx.get(source)]+1;
+					}
+				}
+			}
+		}
+	}
+	
 	@Override
 	public void BFS(DirectedGraphTraverseAction action, DirectedGraphNode startNode) {
 		if (startNode != null && this.getNodes() != null && !this.getNodes().isEmpty() && this.getNodes().contains(startNode)) {

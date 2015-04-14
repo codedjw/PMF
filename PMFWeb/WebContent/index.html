@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Online Process Mining</title>
+<style type="text/css">
+html, body {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+</style>
+<script src="jquery-2.1.0.js"></script>
+<script src="raphael.js"></script>
+<script src="springy.js"></script>
+<script src="springyui.js"></script>
+<script>
+$(document).ready(function() {
+	getResults();
+});
+
+function getResults() {
+	$.ajax({
+		url : "TestServlet",
+		type : "GET",
+		dataType : "json",
+		contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+		success : function(json) {
+			// send back a json object
+			if (json.status == "OK") {
+				displayResults(json.result);
+			}
+ 		},
+
+		// code to run if the request fails;
+		// the raw request and status codes are passed to the function
+		error : function(xhr, status, errThrown) {
+			alert("Sorry, there was a problem!");
+			console.log("Error: " + errThrowm);
+			console.log("Status: " + status);
+			console.dir(xhr); 
+		},
+
+		// code to run regardless of success or failure
+		complete :function(xhr, status) {
+			//alert("The request is complete!");
+		}
+	}); 
+}
+
+var graph = new Springy.Graph();
+
+function displayResults(result) {
+	
+	// transitions
+	if(result == null || result == "") {
+		return;
+	}
+	var nodes = {};
+	var trans = result.Transitions;
+	if (trans != null && trans != "") {
+		$.each(trans, function(index, tran){
+			var tid = tran.tid;
+			var tnode = graph.newNode({label: tran.label});
+			nodes[tid] = tnode;
+		});
+	}
+	var places = result.Places;
+	if (places != null && places != "") {
+		$.each(places, function(index, place){
+			var pid = place.pid;
+			var pnode = graph.newNode({label: place.label});
+			nodes[pid] = pnode;
+		});
+	}
+	var arcs = result.Arcs;
+	if (arcs != null && arcs != "") {
+		$.each(arcs, function(index, arc){
+			var sid = arc.start;
+			var tid = arc.target;
+			graph.newEdge(nodes[sid], nodes[tid], {color: '#7DBE3C'});
+			});
+	}
+}
+	
+</script>
+</head>
+<body>
+<canvas id="demo" width="640" height="480"></canvas>
+<script>
+$('#demo').springy({ graph: graph });
+</script>
+</body>
+</html>

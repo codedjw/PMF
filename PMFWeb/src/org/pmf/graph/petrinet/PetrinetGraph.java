@@ -38,4 +38,5 @@ public interface PetrinetGraph extends DirectedGraph<PetrinetNode, PetrinetEdge<
 	Arc getArc(PetrinetNode source, PetrinetNode target);
 	
 	Collection<Arc> getArcs();
+	
 }
