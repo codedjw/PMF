@@ -52,16 +52,44 @@ public class TestServlet extends HttpServlet {
 	}
 	
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String logJsonStr = request.getParameter("logJson");
+		System.out.println(logJsonStr);
+		JSONObject logJson = JSONObject.fromObject(logJsonStr);
+		int lid = logJson.getInt("logid");
 		Set<String> log = new HashSet<String>();
-		log.add("ABCD");
-		log.add("ACBD");
-		log.add("ABCEFBCD");
-		log.add("ABCEFCBD");
-		log.add("ACBEFBCD");
-		log.add("ACBEFBCEFCBD");
-//		log.add("ABC");
-//		log.add("ABBC");
-//		log.add("ABBBC");
+		switch (lid) {
+		case 0:
+			log.add("ABCD");
+			log.add("ACBD");
+			break;
+		case 1:
+			log.add("ABCEFBCD");
+			log.add("ABCEFCBD");
+			log.add("ACBEFBCD");
+			log.add("ACBEFBCEFCBD");
+			break;
+		case 2:
+			log.add("ABC");
+			log.add("ABBC");
+			log.add("ABBBC");
+			break;
+		case 3:
+			log.add("ABCDEFBDCEG");
+			log.add("ABDCEG");
+			log.add("ABCDEFBCDEFBDCEG");
+			break;
+		case 4:
+			log.add("ACD");
+			log.add("BCD");
+			log.add("ACE");
+			log.add("BCE");
+			break;
+		default:
+			log.add("ABCD");
+			log.add("ACBD");
+			break;
+		}
+		
 		AlphaMiner alpha = new AlphaMiner();
 		Petrinet net;
 		try {

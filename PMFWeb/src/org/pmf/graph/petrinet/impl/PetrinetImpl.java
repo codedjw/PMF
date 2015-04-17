@@ -1,8 +1,10 @@
 package org.pmf.graph.petrinet.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.json.JSONArray;
@@ -216,47 +218,97 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 		}
 	}
 
+//	@Override
+//	public JSONObject buildJson() {
+//		// TODO Auto-generated method stub
+//		JSONObject json = new JSONObject();
+//		if (transitions != null && !transitions.isEmpty()) {
+//			JSONArray tarray = new JSONArray();
+//			for (Transition t : transitions) {
+//				JSONObject tjson = new JSONObject();
+//				tjson.element("tid", t.getId().toString());
+//				tjson.element("label", t.getLabel());
+//				tjson.element("type", t.getAttributeMap().get(AttributeMap.TYPE));
+//				tarray.add(tjson);
+//			}
+//			json.element("Transitions", tarray);
+//		}
+//		if (places != null && !places.isEmpty()) {
+//			JSONArray parray = new JSONArray();
+//			int idx = 0;
+//			for (Place p : places) {
+//				JSONObject pjson = new JSONObject();
+//				pjson.element("pid", p.getId().toString());
+//				if (p.getLabel().equals("Start") || p.getLabel().equals("End")) {
+//					pjson.element("label", p.getLabel());
+//				} else {
+//					pjson.element("label", "P"+idx);
+//					idx++;
+//				}
+//				pjson.element("type", p.getAttributeMap().get(AttributeMap.TYPE));
+//				parray.add(pjson);
+//			}
+//			json.element("Places", parray);
+//		}
+//		if (arcs != null && !arcs.isEmpty()) {
+//			JSONArray arc_array = new JSONArray();
+//			for (Arc a : arcs) {
+//				JSONObject arc_json = new JSONObject();
+//				arc_json.element("start", a.getSource().getId().toString());
+//				arc_json.element("target", a.getTarget().getId().toString());
+//				arc_array.add(arc_json);
+//			}
+//			json.element("Arcs", arc_array);
+//		}
+//		return json;
+//	}
+	
 	@Override
 	public JSONObject buildJson() {
 		// TODO Auto-generated method stub
 		JSONObject json = new JSONObject();
+		JSONArray nodes = null;
+		Map<PetrinetNode, Integer> nodeIdx = new HashMap<PetrinetNode, Integer>();
+		int idx = 0;
 		if (transitions != null && !transitions.isEmpty()) {
-			JSONArray tarray = new JSONArray();
+			nodes = (nodes == null) ? new JSONArray() : nodes;
 			for (Transition t : transitions) {
 				JSONObject tjson = new JSONObject();
-				tjson.element("tid", t.getId().toString());
 				tjson.element("label", t.getLabel());
 				tjson.element("type", t.getAttributeMap().get(AttributeMap.TYPE));
-				tarray.add(tjson);
+				nodes.add(tjson);
+				nodeIdx.put(t, idx);
+				idx++;
 			}
-			json.element("Transitions", tarray);
 		}
 		if (places != null && !places.isEmpty()) {
-			JSONArray parray = new JSONArray();
-			int idx = 0;
+			nodes = (nodes == null) ? new JSONArray() : nodes;
+			int pidx = places.size()-2-1;
 			for (Place p : places) {
 				JSONObject pjson = new JSONObject();
-				pjson.element("pid", p.getId().toString());
 				if (p.getLabel().equals("Start") || p.getLabel().equals("End")) {
 					pjson.element("label", p.getLabel());
 				} else {
-					pjson.element("label", "P"+idx);
-					idx++;
+					pjson.element("label", "P"+pidx);
+					pidx--;
 				}
 				pjson.element("type", p.getAttributeMap().get(AttributeMap.TYPE));
-				parray.add(pjson);
+				nodes.add(pjson);
+				nodeIdx.put(p, idx);
+				idx++;
 			}
-			json.element("Places", parray);
 		}
+		json.element("nodes", nodes);
 		if (arcs != null && !arcs.isEmpty()) {
-			JSONArray arc_array = new JSONArray();
+			JSONArray links = new JSONArray();
 			for (Arc a : arcs) {
 				JSONObject arc_json = new JSONObject();
-				arc_json.element("start", a.getSource().getId().toString());
-				arc_json.element("target", a.getTarget().getId().toString());
-				arc_array.add(arc_json);
+				arc_json.element("source", nodeIdx.get(a.getSource()));
+				arc_json.element("target", nodeIdx.get(a.getTarget()));
+				arc_json.element("type", 1);
+				links.add(arc_json);
 			}
-			json.element("Arcs", arc_array);
+			json.element("links", links);
 		}
 		return json;
 	}
