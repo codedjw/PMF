@@ -44,11 +44,11 @@ function doAlpha() {
 }
 
 function getResults(json) {
-	alert(json);
+	var jsonstr = JSON.stringify(json);
 	$.ajax({
 		url : "TestServlet",
 		data : {
-			"logJson" : json
+			"logJson" : jsonstr
 			},
 		type : "POST",
 		dataType : "json",
@@ -200,13 +200,13 @@ function tick() {
 	  });
 }
 </script>
-Choose a log file:<br>
+<h5>Choose a log file:</h5>
 <select id="logchoice">
 	<option value="0" selected>FILE I</option>
-	<option value="1" selected>FILE II</option>
-	<option value="2" selected>FILE III</option>
-	<option value="3" selected>FILE IV</option>
-	<option value="4" selected>FILE V</option>
+	<option value="1">FILE II</option>
+	<option value="2">FILE III</option>
+	<option value="3">FILE IV</option>
+	<option value="4">FILE V</option>
 </select>
 <input type="button" name="Submit" value="Choose" onClick="doAlpha()" />
 </body>

@@ -61,6 +61,7 @@ public class TestServlet extends HttpServlet {
 		case 0:
 			log.add("ABCD");
 			log.add("ACBD");
+			log.add("AED");
 			break;
 		case 1:
 			log.add("ABCEFBCD");
