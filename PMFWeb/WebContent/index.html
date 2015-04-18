@@ -56,6 +56,7 @@ function getResults(json) {
 		success : function(json) {
 			// send back a json object
 			if (json.status == "OK") {
+				$('#dragchoice').val("0");
 				displayResults(json.result);
 			}
  		},
@@ -96,9 +97,9 @@ var data = {
 };
 
 var force = d3.layout.force()
-	.gravity(0)
-	.linkDistance(100)
-	.charge(-100)
+	.gravity(.05)
+	.linkDistance(80)
+	.charge(-800)
 	.size([width,height])
 	.on("tick", tick);;
 
@@ -106,9 +107,19 @@ var svg = d3.select("body").append("svg")
 	.attr("width", width)
     .attr("height", height);
 
-svg.append("defs").append("marker")
+var link = svg.selectAll(".link"), node = svg.selectAll(".node");
+
+var root;
+
+function update(datajson) {
+
+	root = datajson;
+
+	svg.selectAll("*").remove();
+
+	svg.append("defs").append("marker")
 	.attr("id", "arrowhead")
-	.attr("refX", 17 + 3) /*must be smarter way to calculate shift*/
+	.attr("refX", 17 + 3) //must be smarter way to calculate shift
 	.attr("refY", 2)
 	.attr("markerWidth", 6)
 	.attr("markerHeight", 4)
@@ -116,9 +127,23 @@ svg.append("defs").append("marker")
 	.append("path")
 	.attr("d", "M 0,0 V 4 L6,2 Z"); //this is actual shape for arrowhead
 
-var link = svg.selectAll(".link"), node = svg.selectAll(".node");
-
-function update(root) {
+	// Markers
+    /* svg.append("svg:defs").selectAll("marker")
+        .data(['regular'])
+      .enter().append("svg:marker")
+        .attr("id", String)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 15)
+        .attr("refY", -1.5)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+      .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5"); */
+	
+	link = svg.selectAll(".link");
+	node = svg.selectAll(".node");
+	
 	var nodes = root.nodes;
 	var links = root.links;
 
@@ -154,6 +179,15 @@ function update(root) {
 	  // Exit any old nodes.
 	  node.exit().remove();
 
+	  var drag = force.drag()
+	  				.on("dragstart", function(d,i){
+	  					//拖拽开始后设定被拖拽对象为固定
+		  				d.fixed = true;
+		  			})
+		  			.on("dragend", function(d,i){
+						d.fixed = ($('#dragchoice').val() == 0) ? false : true;
+			  			});
+	  
 	  node.enter().append("svg:g")
 	  	.attr("class", function(d){
 			if (d.type == "PN_TRANSITION") {
@@ -162,7 +196,7 @@ function update(root) {
 				return "circle node";
 			}
 	     })
-		 .call(force.drag);
+		 .call(drag);
 
 	  d3.selectAll(".transition").append("rect")
 	  	.attr("x", function(d) { return -s/2; })
@@ -186,7 +220,9 @@ function update(root) {
 
 	 //标记鼠标悬停的标签
 	 node.append("title")
-		  .text(function(d) { return d.label; });
+		  .text(function(d) {
+			  return d.label; 
+		   });
 }
 
 function tick() {
@@ -207,6 +243,10 @@ function tick() {
 	<option value="2">FILE III</option>
 	<option value="3">FILE IV</option>
 	<option value="4">FILE V</option>
+</select>
+<select id="dragchoice">
+	<option value="0" selected>Active</option>
+	<option value="1">Fixed</option>
 </select>
 <input type="button" name="Submit" value="Choose" onClick="doAlpha()" />
 </body>

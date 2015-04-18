@@ -310,6 +310,7 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 			}
 			json.element("links", links);
 		}
+		System.out.println("json:"+json);
 		return json;
 	}
 
