@@ -29,6 +29,10 @@
         fill:#fff;
 }
 
+.node.fixed {
+  		fill: #ffffe0;
+}
+
 </style>
 <script type="text/javascript" src="jquery-2.1.0.js"></script>
 <script type="text/javascript" src="d3.js"></script>
@@ -186,6 +190,7 @@ function update(datajson) {
 		  			})
 		  			.on("dragend", function(d,i){
 						d.fixed = ($('#dragchoice').val() == 0) ? false : true;
+						d3.select(this).selectAll(".node").classed("fixed", d.fixed);
 			  			});
 	  
 	  node.enter().append("svg:g")
