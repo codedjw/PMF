@@ -107,11 +107,20 @@ var force = d3.layout.force()
 	.size([width,height])
 	.on("tick", tick);;
 
+var zoom = d3.behavior.zoom()
+						.scaleExtent([0.4, 5])
+						.on("zoom", onZoomChanged);
+	
 var svg = d3.select("body").append("svg")
+	.attr("pointer-events", "all")
+	.call(zoom)
 	.attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+	.append("svg:g")
+		.attr("width", width)
+    	.attr("height", height);
 
-var link = svg.selectAll(".link"), node = svg.selectAll(".node");
+var link = svg.append('svg:g').selectAll(".link"), node = svg.append('svg:g').selectAll(".node");
 
 var root;
 
@@ -121,7 +130,7 @@ function update(datajson) {
 
 	svg.selectAll("*").remove();
 
-	svg.append("defs").append("marker")
+	svg.append("svg:defs").append("marker")
 	.attr("id", "arrowhead")
 	.attr("refX", 17 + 3) //must be smarter way to calculate shift
 	.attr("refY", 2)
@@ -145,8 +154,8 @@ function update(datajson) {
       .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5"); */
 	
-	link = svg.selectAll(".link");
-	node = svg.selectAll(".node");
+	link = svg.append('svg:g').selectAll(".link");
+	node = svg.append('svg:g').selectAll(".node");
 	
 	var nodes = root.nodes;
 	var links = root.links;
@@ -186,6 +195,8 @@ function update(datajson) {
 	  var drag = force.drag()
 	  				.on("dragstart", function(d,i){
 	  					//拖拽开始后设定被拖拽对象为固定
+	  					// solve zoom and drag conflict
+	  					d3.event.sourceEvent.stopPropagation();
 		  				d.fixed = true;
 		  			})
 		  			.on("dragend", function(d,i){
@@ -240,7 +251,12 @@ function tick() {
 	      return "translate(" + d.x + "," + d.y + ")";
 	  });
 }
+
+function onZoomChanged() {
+    svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+  }
 </script>
+<!-- <div class="graph"></div> -->
 <h5>Choose a log file:</h5>
 <select id="logchoice">
 	<option value="0" selected>FILE I</option>
