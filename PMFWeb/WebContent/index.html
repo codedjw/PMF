@@ -5,6 +5,29 @@
 <title>Online Process Mining</title>
 <style type="text/css">
 
+#logselectedarea {
+	width: 100%;
+	height: 50px;
+}
+
+#miningarea {
+	width: 100%;
+	height: 500px;
+}
+
+#graph {
+	width: 60%;
+	height: 100%;
+	float: left;
+	border: thin solid #ccc;
+}
+
+#logarea {
+	width: 37%;
+	height: 100%;
+	margin-left: 62%;
+}
+
 .node {
   cursor: pointer;
   stroke: #3182bd;
@@ -62,6 +85,11 @@ function getResults(json) {
 			if (json.status == "OK") {
 				$('#dragchoice').val("0");
 				displayResults(json.result);
+				var loghtml = "";
+				$.each(json.log, function(idx, trace){
+					loghtml += (trace + "<br>");
+					});
+				$('#logtext').html(loghtml);
 			}
  		},
 
@@ -87,10 +115,30 @@ function displayResults(root) {
 </script>
 </head>
 <body>
+<div id="logselectedarea">
+<h5>Choose a log file:</h5>
+<select id="miningalgorithm">
+	<option value="0" selected>Alpha Mining Algorithm</option>
+</select>
+<select id="logchoice">
+	<option value="0" selected>FILE I</option>
+	<option value="1">FILE II</option>
+	<option value="2">FILE III</option>
+	<option value="3">FILE IV</option>
+	<option value="4">FILE V</option>
+</select>
+<select id="dragchoice">
+	<option value="0" selected>Active</option>
+	<option value="1">Fixed</option>
+</select>
+<input type="button" name="Submit" value="Choose" onClick="doAlpha()" />
+</div>
+<div id="miningarea">
+<div id="graph"></div>
 <script>
 var r = 30;
 var s = 50;
-var width = 960, height = 500;
+var width = $("#graph").width(), height = $("#graph").height();
 
 var data = {
 		"nodes":[{"label":"Start", "type":"PN_PLACE"}, 
@@ -111,7 +159,7 @@ var zoom = d3.behavior.zoom()
 						.scaleExtent([0.4, 5])
 						.on("zoom", onZoomChanged);
 	
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#graph").append("svg")
 	.attr("pointer-events", "all")
 	.call(zoom)
 	.attr("width", width)
@@ -256,19 +304,10 @@ function onZoomChanged() {
     svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
   }
 </script>
-<!-- <div class="graph"></div> -->
-<h5>Choose a log file:</h5>
-<select id="logchoice">
-	<option value="0" selected>FILE I</option>
-	<option value="1">FILE II</option>
-	<option value="2">FILE III</option>
-	<option value="3">FILE IV</option>
-	<option value="4">FILE V</option>
-</select>
-<select id="dragchoice">
-	<option value="0" selected>Active</option>
-	<option value="1">Fixed</option>
-</select>
-<input type="button" name="Submit" value="Choose" onClick="doAlpha()" />
+<div id="logarea">
+<h3>The Selected Log file:</h3>
+<h5 id="logtext"></h5>
+</div>
+</div>
 </body>
 </html>

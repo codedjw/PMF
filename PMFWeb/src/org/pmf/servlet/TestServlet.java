@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.pmf.graph.petrinet.Petrinet;
@@ -98,6 +99,11 @@ public class TestServlet extends HttpServlet {
 			JSONObject json = new JSONObject();
 			json.element("status", "OK");
 			json.element("result", net.buildJson());
+			JSONArray logarray = new JSONArray();
+			for (String l : log) {
+				logarray.add(l);
+			}
+			json.element("log", logarray);
 			response.setContentType("application/json; charset=utf-8");		
 			PrintWriter out = response.getWriter();
 			out.print(json);
