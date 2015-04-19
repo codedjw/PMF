@@ -6,7 +6,7 @@
 <style type="text/css">
 
 #logselectedarea {
-	width: 100%;
+	width: 60%;
 	height: 50px;
 }
 
@@ -127,7 +127,7 @@ function displayResults(root) {
 	<option value="3">FILE IV</option>
 	<option value="4">FILE V</option>
 </select>
-<select id="dragchoice">
+<select id="dragchoice" style="float: right;">
 	<option value="0" selected>Active</option>
 	<option value="1">Fixed</option>
 </select>
@@ -164,6 +164,7 @@ var svg = d3.select("#graph").append("svg")
 	.call(zoom)
 	.attr("width", width)
     .attr("height", height)
+    .style("cursor", "move")
 	.append("svg:g")
 		.attr("width", width)
     	.attr("height", height);
