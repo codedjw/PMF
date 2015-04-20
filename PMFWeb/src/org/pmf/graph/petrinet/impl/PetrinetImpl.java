@@ -276,6 +276,7 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 				JSONObject tjson = new JSONObject();
 				tjson.element("label", t.getLabel());
 				tjson.element("type", t.getAttributeMap().get(AttributeMap.TYPE));
+				tjson.element("detail", t.getLabel());
 				nodes.add(tjson);
 				nodeIdx.put(t, idx);
 				idx++;
@@ -288,8 +289,10 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 				JSONObject pjson = new JSONObject();
 				if (p.getLabel().equals("Start") || p.getLabel().equals("End")) {
 					pjson.element("label", p.getLabel());
+					pjson.element("detail", p.getLabel());
 				} else {
 					pjson.element("label", "P"+pidx);
+					pjson.element("detail", "P"+pidx);
 					pidx--;
 				}
 				pjson.element("type", p.getAttributeMap().get(AttributeMap.TYPE));

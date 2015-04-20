@@ -3,8 +3,10 @@ package org.pmf.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,6 +22,7 @@ import org.pmf.graph.petrinet.Place;
 import org.pmf.log.logabstraction.AlphaMinerLogRelationImpl;
 import org.pmf.log.logabstraction.LogRelations;
 import org.pmf.tools.alphaminer.AlphaMiner;
+import org.pmf.util.AttributeMap;
 
 /**
  * Servlet implementation class TestServlet
@@ -58,6 +61,7 @@ public class TestServlet extends HttpServlet {
 		JSONObject logJson = JSONObject.fromObject(logJsonStr);
 		int lid = logJson.getInt("logid");
 		Set<String> log = new HashSet<String>();
+		Map<String, String> detailMap = new HashMap<String, String>();
 		switch (lid) {
 		case 0:
 			log.add("ABCD");
@@ -81,14 +85,32 @@ public class TestServlet extends HttpServlet {
 			log.add("ABCDEFBCDEFBDCEG");
 			break;
 		case 4:
-			log.add("ACD");
-			log.add("BCD");
-			log.add("ACE");
-			log.add("BCE");
+			log.add("ABEF");
+			log.add("ABECDBF");
+			log.add("ABCEDBF");
+			log.add("ABCDEBF");
+			log.add("AEBCDBF");
+			break;
+		case 5:
+			detailMap.put("A", "register request");
+			detailMap.put("B", "examine thoroughly");
+			detailMap.put("C", "examine casually");
+			detailMap.put("D", "check ticket");
+			detailMap.put("E", "decide");
+			detailMap.put("F", "reinitiate request");
+			detailMap.put("G", "pay compensation");
+			detailMap.put("H", "reject request");
+			log.add("ABDEH");
+			log.add("ADCEG");
+			log.add("ACDEFBDEG");
+			log.add("ADBEH");
+			log.add("ACDEFDCEFCDEH");
+			log.add("ACDEG");
 			break;
 		default:
 			log.add("ABCD");
 			log.add("ACBD");
+			log.add("AED");
 			break;
 		}
 		
@@ -98,12 +120,42 @@ public class TestServlet extends HttpServlet {
 			net = alpha.doMining(log);
 			JSONObject json = new JSONObject();
 			json.element("status", "OK");
-			json.element("result", net.buildJson());
-			JSONArray logarray = new JSONArray();
-			for (String l : log) {
-				logarray.add(l);
+			if (detailMap == null || detailMap.isEmpty()) {
+				json.element("result", net.buildJson());
+				JSONArray logarray = new JSONArray();
+				for (String l : log) {
+					logarray.add(l);
+					json.element("log", logarray);
+				}
+			} else {
+				JSONObject result = net.buildJson();
+				JSONArray nodes = result.getJSONArray("nodes");
+				for (int i=0; i<nodes.size(); i++) {
+					JSONObject node = nodes.getJSONObject(i);
+					if (node.getString("type") != null && AttributeMap.Type.PN_TRANSITION.toString().equals(node.getString("type"))) {
+						if (detailMap.containsKey(node.getString("label"))) {
+							node.element("detail", detailMap.get(node.getString("label")));
+						}
+					}
+				}
+				result.element("nodes", nodes);
+				System.out.println("new: "+ result);
+				json.element("result", result);
+				JSONArray logarray = new JSONArray();
+				for (String l : log) {
+					String trace = "";
+					for (int j=0; j<l.length(); j++) {
+						String label = "" + l.charAt(j);
+						String detail = (detailMap.get(label) == null) ? label : detailMap.get(label);
+						if (j != 0) {
+							trace += ", ";
+						}
+						trace += detail;
+					}
+					logarray.add(trace);
+					json.element("log", logarray);
+				}
 			}
-			json.element("log", logarray);
 			response.setContentType("application/json; charset=utf-8");		
 			PrintWriter out = response.getWriter();
 			out.print(json);

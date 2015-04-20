@@ -56,6 +56,36 @@
   		fill: #ffffe0;
 }
 
+table.hovertable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #999999;
+	border-collapse: collapse;
+	width: 100%;
+}
+table.hovertable th {
+	background-color:#F0F8FF;
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9c6c9;
+}
+table.hovertable tr {
+	background-color:#FFFFFF;
+}
+table.hovertable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #a9c6c9;
+}
+
+th.first, tr.first {
+	width: 20%;
+}
+
 </style>
 <script type="text/javascript" src="jquery-2.1.0.js"></script>
 <script type="text/javascript" src="d3.js"></script>
@@ -85,10 +115,16 @@ function getResults(json) {
 			if (json.status == "OK") {
 				$('#dragchoice').val("0");
 				displayResults(json.result);
-				var loghtml = "";
+				var loghtml = "<table class='hovertable'>";
+				loghtml += ("<tr>"+"<th class='first' align='center'>Case id</th>"+"<th>Trace</th>"+"</tr>");
 				$.each(json.log, function(idx, trace){
-					loghtml += (trace + "<br>");
+					loghtml += "<tr>";
+					var id = idx+1;
+					loghtml += ("<td class='first' align='center'>"+("Case #"+id)+"</td>");
+					loghtml += ("<td>"+trace+"</td>");
+					loghtml += "</tr>";
 					});
+				loghtml += "</table>";
 				$('#logtext').html(loghtml);
 			}
  		},
@@ -126,6 +162,7 @@ function displayResults(root) {
 	<option value="2">FILE III</option>
 	<option value="3">FILE IV</option>
 	<option value="4">FILE V</option>
+	<option value="5">DEMO</option>
 </select>
 <select id="dragchoice" style="float: right;">
 	<option value="0" selected>Active</option>
@@ -141,9 +178,9 @@ var s = 50;
 var width = $("#graph").width(), height = $("#graph").height();
 
 var data = {
-		"nodes":[{"label":"Start", "type":"PN_PLACE"}, 
-		 		{"label":"A", "type":"PN_TRANSITION"},
-		 		{"label":"End", "type":"PN_PLACE"}],
+		"nodes":[{"label":"Start", "detail":"Start", "type":"PN_PLACE"}, 
+		 		{"label":"A", "detail":"A", "type":"PN_TRANSITION"},
+		 		{"label":"End", "detail":"End", "type":"PN_PLACE"}],
 		"links":[{"source":0, "target":1, "type":1},
 		         {"source":1, "target":2, "type":1}]
 };
@@ -286,7 +323,7 @@ function update(datajson) {
 	 //标记鼠标悬停的标签
 	 node.append("title")
 		  .text(function(d) {
-			  return d.label; 
+			  return d.detail; 
 		   });
 }
 
