@@ -274,7 +274,9 @@ public class PetrinetImpl extends AbstractDirectedGraph<PetrinetNode, PetrinetEd
 			nodes = (nodes == null) ? new JSONArray() : nodes;
 			for (Transition t : transitions) {
 				JSONObject tjson = new JSONObject();
-				tjson.element("label", t.getLabel());
+				String[] lbls = t.getLabel().split("\\+");
+				String lbl = (lbls[0] == null) ? "" : lbls[0];
+				tjson.element("label", lbl);
 				tjson.element("type", t.getAttributeMap().get(AttributeMap.TYPE));
 				tjson.element("detail", t.getLabel());
 				nodes.add(tjson);

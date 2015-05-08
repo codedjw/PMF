@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.model.XLog;
 import org.pmf.util.Pair;
 
 public class AlphaMinerLogRelationImpl extends AbstractLogRelations implements
@@ -11,20 +13,20 @@ public class AlphaMinerLogRelationImpl extends AbstractLogRelations implements
 	
 	protected int[][] parallelMatrix;
 
-	public AlphaMinerLogRelationImpl(Set<String> log) {
+	public AlphaMinerLogRelationImpl(XLog log) {
 		super(log);
 	}
 
 	@Override
-	public Map<Pair<String, String>, Integer> parallelRelations() {
+	public Map<Pair<XEventClass, XEventClass>, Integer> parallelRelations() {
 		// TODO Auto-generated method stub
-		Map<Pair<String, String>, Integer> result = new HashMap<Pair<String, String>, Integer>();
+		Map<Pair<XEventClass, XEventClass>, Integer> result = new HashMap<Pair<XEventClass, XEventClass>, Integer>();
         for (int i = 0; i < this.parallelMatrix.length; i++) {
             for (int j = 0; j < this.parallelMatrix[i].length; j++) {
                 if (this.parallelMatrix[i][j] > 0) {
-                	String from = this.trans.get(i);
-                	String to = this.trans.get(j);
-                    result.put(new Pair<String, String>(from, to), this.parallelMatrix[i][j]);
+                	XEventClass from = this.trans.get(i);
+                	XEventClass to = this.trans.get(j);
+                    result.put(new Pair<XEventClass, XEventClass>(from, to), this.parallelMatrix[i][j]);
                 }
             }
         }

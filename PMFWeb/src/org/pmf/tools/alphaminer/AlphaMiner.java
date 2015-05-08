@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 
+import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.model.XLog;
 import org.pmf.graph.petrinet.*;
 import org.pmf.log.logabstraction.AlphaMinerLogRelationImpl;
 import org.pmf.log.logabstraction.LogRelations;
@@ -20,9 +22,9 @@ import org.pmf.util.search.*;
 public class AlphaMiner implements NodeExpander<Tuple> {
 	
 	private LogRelations relations;
-	private List<String> trans;
+	private List<XEventClass> trans;
 	
-	public Petrinet doMining(Set<String> log) throws InterruptedException, ExecutionException {
+	public Petrinet doMining(XLog log) throws InterruptedException, ExecutionException {
 		if (log != null && !log.isEmpty()) {
 			LogRelations logRelations = new AlphaMinerLogRelationImpl(log);
 			if (logRelations != null) {
@@ -46,9 +48,9 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 //		this.trans.removeAll(this.relations.lengthOneLoops().keySet());
 		
 		Stack<Tuple> stack = new Stack<Tuple>();
-		for (Pair<String, String> causal : this.relations.causalRelations().keySet()) {
-			String from = causal.getFirst();
-			String to = causal.getSecond();
+		for (Pair<XEventClass, XEventClass> causal : this.relations.causalRelations().keySet()) {
+			XEventClass from = causal.getFirst();
+			XEventClass to = causal.getSecond();
 			if (this.trans.contains(from) && this.trans.contains(to)) {
 				Tuple tuple = new Tuple();
 				tuple.leftPart.add(from);
@@ -74,9 +76,9 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		Petrinet net = PetrinetFactory.newPetrinet("Test for Alpha");
 		
 		// add transitions
-		Map<String, Transition> class2transition = new HashMap<String, Transition>();
-		for (String t : this.trans) {
-			Transition transition = net.addTransition(t);
+		Map<XEventClass, Transition> class2transition = new HashMap<XEventClass, Transition>();
+		for (XEventClass t : this.trans) {
+			Transition transition = net.addTransition(t.toString());
 			class2transition.put(t, transition);
 		}
 		
@@ -86,11 +88,11 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		for (Tuple t : result) {
 			Place place = net.addPlace("P"+idx/*+"("+t.toString()+")"*/);
 			idx++;
-			for (String source : t.leftPart) {
+			for (XEventClass source : t.leftPart) {
 				Transition st = class2transition.get(source);
 				Arc s2p = net.addArc(st, place);
 			}
-			for (String target : t.rightPart) {
+			for (XEventClass target : t.rightPart) {
 				Transition tt = class2transition.get(target);
 				Arc p2t = net.addArc(place, tt);
 			}
@@ -99,17 +101,17 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		
 		// add initial and end place
 		Place pstart = net.addPlace("Start");
-		Set<String> starts = this.relations.startTraceInfo().keySet();
+		Set<XEventClass> starts = this.relations.startTraceInfo().keySet();
 		if (starts != null && !starts.isEmpty()) {
-			for (String sc : starts) {
+			for (XEventClass sc : starts) {
 				Transition st = class2transition.get(sc);
 				Arc pstart2t = net.addArc(pstart, st);
 			}
 		}
 		Place pend = net.addPlace("End");
-		Set<String> ends = this.relations.endTraceInfo().keySet();
+		Set<XEventClass> ends = this.relations.endTraceInfo().keySet();
 		if (ends != null && !ends.isEmpty()) {
-			for (String ec : ends) {
+			for (XEventClass ec : ends) {
 				Transition et = class2transition.get(ec);
 				Arc t2pend = net.addArc(et, pend);
 			}
@@ -117,9 +119,9 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		
 		// connect 1-loops http://0agr.ru/wiki/index.php/Alpha_Algorithm
 		// not check
-		Set<String> oneLoops = this.relations.lengthOneLoops().keySet();
+		Set<XEventClass> oneLoops = this.relations.lengthOneLoops().keySet();
 		if (oneLoops != null && !oneLoops.isEmpty()) {
-			for (String oneLoop : oneLoops) {
+			for (XEventClass oneLoop : oneLoops) {
 				Tuple t = new Tuple(); // one loop place
 				t.leftPart.add(oneLoop);
 				t.rightPart.add(oneLoop);
@@ -144,7 +146,7 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		int startIndex = toExpand.maxLeftIndex + 1;
 		for (int i = startIndex; i < this.trans.size(); i++) {
 
-			String toAdd = this.trans.get(i);
+			XEventClass toAdd = this.trans.get(i);
 
 			if (canExpandLeft(toExpand, toAdd)) {
 				// Ok, it is safe to add toAdd
@@ -159,7 +161,7 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		startIndex = toExpand.maxRightIndex + 1;
 		for (int i = startIndex; i < this.trans.size(); i++) {
 
-			String toAdd = this.trans.get(i);
+			XEventClass toAdd = this.trans.get(i);
 
 			if (canExpandRight(toExpand, toAdd)) {
 				// Ok, it is safe to add toAdd
@@ -196,10 +198,10 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		
 	}
 	
-	private boolean canExpandLeft(Tuple toExpand, String toAdd) {
+	private boolean canExpandLeft(Tuple toExpand, XEventClass toAdd) {
 		// Check if the event class in toAdd has a causal depencendy 
 		// with all elements of the rightPart of the tuple.
-		for (String right : toExpand.rightPart) {
+		for (XEventClass right : toExpand.rightPart) {
 			if (!hasCausalRelation(toAdd, right)) {
 				return false;
 			}
@@ -207,7 +209,7 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 
 		// Check if the event class in toAdd does not have a relation 
 		// with any of the elements of the leftPart of the tuple.
-		for (String left : toExpand.leftPart) {
+		for (XEventClass left : toExpand.leftPart) {
 			if (hasRelation(toAdd, left)) {
 				return false;
 			}
@@ -216,10 +218,10 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		return true;
 	}
 
-	private boolean canExpandRight(Tuple toExpand, String toAdd) {
+	private boolean canExpandRight(Tuple toExpand, XEventClass toAdd) {
 		// Check if the event class in toAdd has a causal depencendy 
 		// from all elements of the leftPart of the tuple.
-		for (String left : toExpand.leftPart) {
+		for (XEventClass left : toExpand.leftPart) {
 			if (!hasCausalRelation(left, toAdd)) {
 				return false;
 			}
@@ -227,7 +229,7 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 
 		// Check if the event class in toAdd does not have a relation 
 		// with any of the elements of the rightPart of the tuple.
-		for (String right : toExpand.rightPart) {
+		for (XEventClass right : toExpand.rightPart) {
 			if (hasRelation(right, toAdd)) {
 				return false;
 			}
@@ -236,7 +238,7 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 		return true;
 	}
 
-	private boolean hasRelation(String from, String to) {
+	private boolean hasRelation(XEventClass from, XEventClass to) {
 		if (!from.equals(to)) {
 			if (hasCausalRelation(from, to)) {
 				return true;
@@ -245,15 +247,15 @@ public class AlphaMiner implements NodeExpander<Tuple> {
 				return true;
 			}
 		}
-		if (relations.parallelRelations().containsKey(new Pair<String, String>(from, to))) {
+		if (relations.parallelRelations().containsKey(new Pair<XEventClass, XEventClass>(from, to))) {
 			return true;
 		}
 		return false;
 
 	}
 
-	private boolean hasCausalRelation(String from, String to) {
-		if (relations.causalRelations().containsKey(new Pair<String, String>(from, to))) {
+	private boolean hasCausalRelation(XEventClass from, XEventClass to) {
+		if (relations.causalRelations().containsKey(new Pair<XEventClass, XEventClass>(from, to))) {
 			return true;
 		}
 		return false;

@@ -5,29 +5,32 @@ import java.util.Map;
 import java.util.Set;
 
 import org.pmf.util.Pair;
+import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.classification.XEventClasses;
+import org.deckfour.xes.model.XLog;
 
 public interface LogRelations {
-	public Set<String> getLog();
+	public XLog getLog();
 	
-	public Set<String> getTransitions();
+	public XEventClasses getTransitions();
 	
-	public List<String> getTrans();
+	public List<XEventClass> getTrans();
 	
-	public Pair<List<String>, int[][]> directlyFollowMatrix();
+	public Pair<List<XEventClass>, int[][]> directlyFollowMatrix();
 	
-	public Pair<List<String>, int[][]> causalMatrix();
+	public Pair<List<XEventClass>, int[][]> causalMatrix();
 	
-	public Map<Pair<String, String>, Integer> causalRelations();
+	public Map<Pair<XEventClass, XEventClass>, Integer> causalRelations();
 	
-	public Map<Pair<String, String>, Integer> parallelRelations();
+	public Map<Pair<XEventClass, XEventClass>, Integer> parallelRelations();
 	
-	public Map<Pair<String, String>, Integer> directFollowRelations();
+	public Map<Pair<XEventClass, XEventClass>, Integer> directFollowRelations();
 	
-	public Map<String, Integer> startTraceInfo();
+	public Map<XEventClass, Integer> startTraceInfo();
 	
-	public Map<String, Integer> endTraceInfo();
+	public Map<XEventClass, Integer> endTraceInfo();
 	
-	public Map<String, Integer> lengthOneLoops();
+	public Map<XEventClass, Integer> lengthOneLoops();
 	
-	public Map<Pair<String, String>, Integer> lengthTwoLoops();
+	public Map<Pair<XEventClass, XEventClass>, Integer> lengthTwoLoops();
 }

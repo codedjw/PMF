@@ -9,53 +9,44 @@
 	width: 60%;
 	height: 50px;
 }
-
 #miningarea {
 	width: 100%;
 	height: 500px;
 }
-
 #graph {
 	width: 60%;
 	height: 100%;
 	float: left;
 	border: thin solid #ccc;
 }
-
 #logarea {
 	width: 37%;
 	height: 100%;
 	margin-left: 62%;
 }
-
 .node {
   cursor: pointer;
   stroke: #3182bd;
   stroke-width: 1.5px;
 }
-
 .link {
   stroke: #000;
   stroke-width: 3px;
 }
-
 .nodetext {
   pointer-events: none;
   font: 12px;
   font-family:helvetica,arial;
 }
-
 .node.type0 {
         fill:#fff;
 }
 .node.type1 {
         fill:#fff;
 }
-
 .node.fixed {
   		fill: #ffffe0;
 }
-
 table.hovertable {
 	font-family: verdana,arial,sans-serif;
 	font-size:11px;
@@ -81,7 +72,6 @@ table.hovertable td {
 	border-style: solid;
 	border-color: #a9c6c9;
 }
-
 th.first, tr.first {
 	width: 20%;
 }
@@ -116,12 +106,11 @@ function getResults(json) {
 				$('#dragchoice').val("0");
 				displayResults(json.result);
 				var loghtml = "<table class='hovertable'>";
-				loghtml += ("<tr>"+"<th class='first' align='center'>Case id</th>"+"<th>Trace</th>"+"</tr>");
-				$.each(json.log, function(idx, trace){
+				loghtml += ("<tr>"+"<th>Event Classes</th>"+"<th>Frequencies</th>"+"</tr>");
+				$.each(json.log, function(idx, logitem){
 					loghtml += "<tr>";
-					var id = idx+1;
-					loghtml += ("<td class='first' align='center'>"+("Case #"+id)+"</td>");
-					loghtml += ("<td>"+trace+"</td>");
+					loghtml += ("<td align='center'>"+logitem.EventClass+"</td>");
+					loghtml += ("<td align='center'>"+logitem.Frequency+"</td>");
 					loghtml += "</tr>";
 					});
 				loghtml += "</table>";
@@ -152,7 +141,7 @@ function displayResults(root) {
 </head>
 <body>
 <div id="logselectedarea">
-<h5>Choose a log file:</h5>
+<h3>Choose a log file:</h3>
 <select id="miningalgorithm">
 	<option value="0" selected>Alpha Mining Algorithm</option>
 </select>
@@ -162,7 +151,13 @@ function displayResults(root) {
 	<option value="2">FILE III</option>
 	<option value="3">FILE IV</option>
 	<option value="4">FILE V</option>
-	<option value="5">DEMO</option>
+	<option value="5">FILE VI</option>
+	<option value="6">FILE VII</option>
+	<option value="7">FILE VIII</option>
+	<option value="8">FILE IX</option>
+	<option value="9">FILE X</option>
+	<option value="10">FILE XI</option>
+	<option value="11">DEMO</option>
 </select>
 <select id="dragchoice" style="float: right;">
 	<option value="0" selected>Active</option>
@@ -343,7 +338,7 @@ function onZoomChanged() {
   }
 </script>
 <div id="logarea">
-<h3>The Selected Log file:</h3>
+<h3>SAMMARY of the Selected Log:</h3>
 <h5 id="logtext"></h5>
 </div>
 </div>

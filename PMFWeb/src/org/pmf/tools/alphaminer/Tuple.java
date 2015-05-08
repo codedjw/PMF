@@ -3,11 +3,13 @@ package org.pmf.tools.alphaminer;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.deckfour.xes.classification.XEventClass;
+
 class Tuple {
 
-	public Set<String> leftPart = new HashSet<String>();
+	public Set<XEventClass> leftPart = new HashSet<XEventClass>();
 
-	public Set<String> rightPart = new HashSet<String>();
+	public Set<XEventClass> rightPart = new HashSet<XEventClass>();
 
 	public int maxRightIndex = 0;
 	public int maxLeftIndex = 0;

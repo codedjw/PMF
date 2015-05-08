@@ -8,14 +8,21 @@ import java.util.Map;
 import java.util.Set;
 
 import org.pmf.util.Pair;
+import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.classification.XEventClasses;
+import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
+import org.deckfour.xes.info.XLogInfo;
+import org.deckfour.xes.info.XLogInfoFactory;
 
 public abstract class AbstractLogRelations implements LogRelations {
 	
-	protected Set<String> log;
-	protected Set<String> transitions;
+	protected XLog log;
+	protected XLogInfo logInfo;
+	protected XEventClasses transitions;
 	
 	/* Matrices filled by this class */
-	protected List<String> trans;
+	protected List<XEventClass> trans;
 	protected int[][] absoluteDirectlyFollowMatrix;
     protected int[][] absoluteLengthTwoLoopMatrix;
     protected int[] starts;
@@ -23,9 +30,9 @@ public abstract class AbstractLogRelations implements LogRelations {
     
     /* Matrices filled by the child classes */
     protected int[][] causalMatrix;
-    protected final Map<Pair<String, String>, Set<String>> dfrTraceMap = new HashMap<Pair<String, String>, Set<String>>();
+    protected final Map<Pair<XEventClass, XEventClass>, Set<XTrace>> dfrTraceMap = new HashMap<Pair<XEventClass, XEventClass>, Set<XTrace>>();
     
-    private void parseLog() {
+    /*private void parseLog() {
     	if (this.log != null && !this.log.isEmpty()) {
     		this.transitions = new HashSet<String>();
     		for (String trace : this.log) {
@@ -45,12 +52,16 @@ public abstract class AbstractLogRelations implements LogRelations {
     			this.trans.add(t);
     		}
     	}
-    }
+    }*/
     
-    public AbstractLogRelations(Set<String> log) {
+    public AbstractLogRelations(XLog log) {
     	this.log = log;
-    	this.parseLog();
-    	this.setupTrans();
+    	this.logInfo = XLogInfoFactory.createLogInfo(log);
+//    	this.parseLog();
+//    	this.setupTrans();
+    	this.transitions = this.logInfo.getEventClasses();
+    	this.trans = new ArrayList<XEventClass>(this.transitions.size());
+    	this.trans.addAll(this.transitions.getClasses());
     	
     	this.absoluteDirectlyFollowMatrix = new int[this.trans.size()][this.trans.size()];
     	this.absoluteLengthTwoLoopMatrix = new int[this.trans.size()][this.trans.size()];
@@ -73,77 +84,79 @@ public abstract class AbstractLogRelations implements LogRelations {
      */
     protected void fillDirectSuccessionMatrices() {
         if (this.log != null && !this.log.isEmpty()) {
-        	for (String trace : this.log) {
-        		this.starts[this.trans.indexOf(""+trace.charAt(0))]++;
-                for (int i=0; i < trace.length()-1; i++) {
-                    String from = "" + trace.charAt(i);
-                    String to = "" + trace.charAt(i+1);
-                    if (traceContainsLengthTwoConstruct(trace, i, from, to)) {
-                        this.absoluteLengthTwoLoopMatrix[this.trans.indexOf(from)][this.trans.indexOf(to)]++;
+        	for (XTrace trace : this.log) {
+        		if (trace != null && !trace.isEmpty()) {
+        			this.starts[this.trans.indexOf(this.transitions.getClassOf(trace.get(0)))]++;
+                    for (int i=0; i < trace.size()-1; i++) {
+                        XEventClass from = this.transitions.getClassOf(trace.get(i));
+                        XEventClass to = this.transitions.getClassOf(trace.get(i+1));
+                        if (traceContainsLengthTwoConstruct(trace, i, from, to)) {
+                            this.absoluteLengthTwoLoopMatrix[this.trans.indexOf(from)][this.trans.indexOf(to)]++;
+                        }
+                        storePair(this.trans.indexOf(from), this.trans.indexOf(to), trace);
                     }
-                    storePair(this.trans.indexOf(from), this.trans.indexOf(to), trace);
-                }
-                this.ends[this.trans.indexOf(""+trace.charAt(trace.length()-1))]++;
+                    this.ends[this.trans.indexOf(this.transitions.getClassOf(trace.get(trace.size()-1)))]++;
+        		}
             }
         }
     }
 
-	protected void storePair(int fromIndex, int toIndex, String trace) {
+	protected void storePair(int fromIndex, int toIndex, XTrace trace) {
 		// TODO Auto-generated method stub
 		this.absoluteDirectlyFollowMatrix[fromIndex][toIndex]++;
 
-        Pair<String, String> pair = new Pair<String, String>(this.trans.get(fromIndex), this.trans.get(toIndex));
-        Set<String> traces = (this.dfrTraceMap.containsKey(pair) ? this.dfrTraceMap.get(pair) : new HashSet<String>());
+        Pair<XEventClass, XEventClass> pair = new Pair<XEventClass, XEventClass>(this.trans.get(fromIndex), this.trans.get(toIndex));
+        Set<XTrace> traces = (this.dfrTraceMap.containsKey(pair) ? this.dfrTraceMap.get(pair) : new HashSet<XTrace>());
         traces.add(trace);
         this.dfrTraceMap.put(pair, traces);
 	}
 
-	protected boolean traceContainsLengthTwoConstruct(String trace, int fromIndex,
-			String from, String to) {
+	protected boolean traceContainsLengthTwoConstruct(XTrace trace, int fromIndex,
+			XEventClass from, XEventClass to) {
 		// TODO Auto-generated method stub
-		return fromIndex < trace.length()-2 && !(from.equals(to)) && from.equals(""+trace.charAt(fromIndex+2));
+		return fromIndex < trace.size()-2 && !(from.equals(to)) && from.equals(this.transitions.getClassOf(trace.get(fromIndex+2)));
 	}
 
 	@Override
-	public Set<String> getLog() {
+	public XLog getLog() {
 		// TODO Auto-generated method stub
 		return this.log;
 	}
 
 	@Override
-	public Set<String> getTransitions() {
+	public XEventClasses getTransitions() {
 		// TODO Auto-generated method stub
 		return this.transitions;
 	}
 	
 	@Override
-	public List<String> getTrans() {
+	public List<XEventClass> getTrans() {
 		// TODO Auto-generated method stub
 		return this.trans;
 	}
 
 	@Override
-	public Pair<List<String>, int[][]> directlyFollowMatrix() {
+	public Pair<List<XEventClass>, int[][]> directlyFollowMatrix() {
 		// TODO Auto-generated method stub
-		return new Pair<List<String>, int[][]>(this.trans, this.absoluteDirectlyFollowMatrix);
+		return new Pair<List<XEventClass>, int[][]>(this.trans, this.absoluteDirectlyFollowMatrix);
 	}
 
 	@Override
-	public Pair<List<String>, int[][]> causalMatrix() {
+	public Pair<List<XEventClass>, int[][]> causalMatrix() {
 		// TODO Auto-generated method stub
-		return new Pair<List<String>, int[][]>(this.trans, this.causalMatrix);
+		return new Pair<List<XEventClass>, int[][]>(this.trans, this.causalMatrix);
 	}
 
 	@Override
-	public Map<Pair<String, String>, Integer> causalRelations() {
+	public Map<Pair<XEventClass, XEventClass>, Integer> causalRelations() {
 		// TODO Auto-generated method stub
-		Map<Pair<String, String>, Integer> result = new HashMap<Pair<String, String>, Integer>();
+		Map<Pair<XEventClass, XEventClass>, Integer> result = new HashMap<Pair<XEventClass, XEventClass>, Integer>();
 		for (int i=0; i<this.causalMatrix.length; i++) {
 			for (int j=0; j<this.causalMatrix[i].length; j++) {
 				if (i != j && this.causalMatrix[i][j] > 0) {
-					String from = this.trans.get(i);
-					String to = this.trans.get(j);
-					result.put(new Pair<String, String>(from, to), this.causalMatrix[i][j]); 
+					XEventClass from = this.trans.get(i);
+					XEventClass to = this.trans.get(j);
+					result.put(new Pair<XEventClass, XEventClass>(from, to), this.causalMatrix[i][j]); 
 				}
 			}
 		}
@@ -151,15 +164,15 @@ public abstract class AbstractLogRelations implements LogRelations {
 	}
 
 	@Override
-	public Map<Pair<String, String>, Integer> directFollowRelations() {
+	public Map<Pair<XEventClass, XEventClass>, Integer> directFollowRelations() {
 		// TODO Auto-generated method stub
-		Map<Pair<String, String>, Integer> result = new HashMap<Pair<String, String>, Integer>();
+		Map<Pair<XEventClass, XEventClass>, Integer> result = new HashMap<Pair<XEventClass, XEventClass>, Integer>();
 		for (int i=0; i<this.absoluteDirectlyFollowMatrix.length; i++) {
 			for (int j=0; j<this.absoluteDirectlyFollowMatrix[i].length; j++) {
 				if (this.absoluteDirectlyFollowMatrix[i][j] > 0) {
-					String from = this.trans.get(i);
-					String to = this.trans.get(j);
-					result.put(new Pair<String, String>(from, to), this.absoluteDirectlyFollowMatrix[i][j]); 
+					XEventClass from = this.trans.get(i);
+					XEventClass to = this.trans.get(j);
+					result.put(new Pair<XEventClass, XEventClass>(from, to), this.absoluteDirectlyFollowMatrix[i][j]); 
 				}
 			}
 		}
@@ -167,12 +180,12 @@ public abstract class AbstractLogRelations implements LogRelations {
 	}
 
 	@Override
-	public Map<String, Integer> startTraceInfo() {
+	public Map<XEventClass, Integer> startTraceInfo() {
 		// TODO Auto-generated method stub
-		Map<String, Integer> result = new HashMap<String, Integer>();
+		Map<XEventClass, Integer> result = new HashMap<XEventClass, Integer>();
 		for (int i=0; i<this.starts.length; i++) {
 			if (this.starts[i] > 0) {
-				String t = this.trans.get(i);
+				XEventClass t = this.trans.get(i);
 				result.put(t, this.starts[i]);
 			}
 		}
@@ -180,12 +193,12 @@ public abstract class AbstractLogRelations implements LogRelations {
 	}
 
 	@Override
-	public Map<String, Integer> endTraceInfo() {
+	public Map<XEventClass, Integer> endTraceInfo() {
 		// TODO Auto-generated method stub
-		Map<String, Integer> result = new HashMap<String, Integer>();
+		Map<XEventClass, Integer> result = new HashMap<XEventClass, Integer>();
 		for (int i=0; i<this.ends.length; i++) {
 			if (this.ends[i] > 0) {
-				String t = this.trans.get(i);
+				XEventClass t = this.trans.get(i);
 				result.put(t, this.ends[i]);
 			}
 		}
@@ -193,9 +206,9 @@ public abstract class AbstractLogRelations implements LogRelations {
 	}
 
 	@Override
-	public Map<String, Integer> lengthOneLoops() {
+	public Map<XEventClass, Integer> lengthOneLoops() {
 		// TODO Auto-generated method stub
-		Map<String, Integer> result = new HashMap<String, Integer>();
+		Map<XEventClass, Integer> result = new HashMap<XEventClass, Integer>();
 		for (int i=0; i<this.trans.size(); i++) {
 			if (this.absoluteDirectlyFollowMatrix[i][i] > 0) {
 				result.put(this.trans.get(i), this.absoluteDirectlyFollowMatrix[i][i]);
@@ -205,15 +218,15 @@ public abstract class AbstractLogRelations implements LogRelations {
 	}
 
 	@Override
-	public Map<Pair<String, String>, Integer> lengthTwoLoops() {
+	public Map<Pair<XEventClass, XEventClass>, Integer> lengthTwoLoops() {
 		// TODO Auto-generated method stub
-		Map<Pair<String, String>, Integer> result = new HashMap<Pair<String, String>, Integer>();
+		Map<Pair<XEventClass, XEventClass>, Integer> result = new HashMap<Pair<XEventClass, XEventClass>, Integer>();
 		for (int i=0; i<this.absoluteLengthTwoLoopMatrix.length; i++) {
 			for (int j=0; j<this.absoluteLengthTwoLoopMatrix[i].length; j++) {
 				if (this.absoluteLengthTwoLoopMatrix[i][j] > 0) {
-					String from = this.trans.get(i);
-					String to = this.trans.get(j);
-					result.put(new Pair<String, String>(from, to), this.absoluteLengthTwoLoopMatrix[i][j]); 
+					XEventClass from = this.trans.get(i);
+					XEventClass to = this.trans.get(j);
+					result.put(new Pair<XEventClass, XEventClass>(from, to), this.absoluteLengthTwoLoopMatrix[i][j]); 
 				}
 			}
 		}
