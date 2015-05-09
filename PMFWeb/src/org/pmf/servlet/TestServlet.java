@@ -106,8 +106,11 @@ public class TestServlet extends HttpServlet {
 		case 10:
 			logfile = "L11.xes";
 			break;
-		default:
+		case 11:
 			logfile = "L12.xes";
+			break;
+		default:
+			logfile = "bigger-example.xes";
 			break;
 		}
 		
