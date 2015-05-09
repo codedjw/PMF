@@ -24,6 +24,13 @@
 	height: 100%;
 	margin-left: 62%;
 }
+#showarea {
+	width: 100%;
+}
+#logtext {
+	width: 100%;
+	margin-top:5%;
+}
 .node {
   cursor: pointer;
   stroke: #3182bd;
@@ -79,16 +86,118 @@ th.first, tr.first {
 </style>
 <script type="text/javascript" src="jquery-2.1.0.js"></script>
 <script type="text/javascript" src="d3.js"></script>
+<script type="text/javascript" src="highcharts/highcharts.js"></script>
+<script type="text/javascript" src="highcharts/highcharts-3d.js"></script>
+<script type="text/javascript" src="highcharts/modules/exporting.js"></script>
 <script>
 $(document).ready(function() {
 	var json = {logid : 0};
 	getResults(json);
 });
 
+function show3DChart(divId, titleText, xCat, yTitleText, seriesName, seriesData, unit) {
+	var chart;
+	chart = new Highcharts.Chart({
+        chart: {
+        	renderTo: divId,
+            type: 'column',
+            margin: 75,
+            options3d: {
+                enabled: true,
+                alpha: 10,
+                beta: 25,
+                depth: 70
+            }
+        },
+        title: {
+            text: titleText
+        },
+        subtitle: {
+            text: 'Source: www.pmf.org'
+        },
+        plotOptions: {
+            column: {
+                depth: 25
+            }
+        },
+        xAxis: {
+            categories: xCat
+        },
+        yAxis: {
+            title: {
+                text: yTitleText
+            }
+        },
+        tooltip: {
+			formatter: function() {
+	                return '<b>'+ this.series.name +'</b><br/>'+
+					this.x +': '+ this.y + unit;
+			}
+		},
+        series: [{
+            name: seriesName,
+            data: seriesData
+        }]
+    });
+}
+
+function showChart (divId, titleText, xCat, yTitleText, seriesName, seriesData, unit) {
+	var chart;
+	chart = new Highcharts.Chart({
+		chart: {
+			renderTo: divId,
+			defaultSeriesType: 'line',
+			marginRight: 130,
+			marginBottom: 25
+		},
+		title: {
+			text: titleText,
+			x: -20 //center
+		},
+		subtitle: {
+			text: 'Source: www.pmf.org',
+			x: -20
+		},
+		xAxis: {
+			categories: xCat
+		},
+		yAxis: {
+			title: {
+				text: yTitleText
+			},
+			plotLines: [{
+				value: 0,
+				width: 1,
+				color: '#808080'
+			}]
+		},
+		tooltip: {
+			formatter: function() {
+	                return '<b>'+ this.series.name +'</b><br/>'+
+					this.x +': '+ this.y + unit;
+			}
+		},
+		legend: {
+			layout: 'vertical',
+			align: 'right',
+			verticalAlign: 'top',
+			x: -10,
+			y: 100,
+			borderWidth: 0
+		},
+		series: [{
+			name: seriesName,
+			data: seriesData
+		}]
+	});
+}
+
 function doAlpha() {
 	var json = {logid : $("#logchoice").val()};
 	getResults(json);
 }
+
+var logResult;
 
 function getResults(json) {
 	var jsonstr = JSON.stringify(json);
@@ -105,16 +214,8 @@ function getResults(json) {
 			if (json.status == "OK") {
 				$('#dragchoice').val("0");
 				displayResults(json.result);
-				var loghtml = "<table class='hovertable'>";
-				loghtml += ("<tr>"+"<th>Event Classes</th>"+"<th>Frequencies</th>"+"</tr>");
-				$.each(json.log, function(idx, logitem){
-					loghtml += "<tr>";
-					loghtml += ("<td align='center'>"+logitem.EventClass+"</td>");
-					loghtml += ("<td align='center'>"+logitem.Frequency+"</td>");
-					loghtml += "</tr>";
-					});
-				loghtml += "</table>";
-				$('#logtext').html(loghtml);
+				logResult = json.log;
+				showResultIn3DC();
 			}
  		},
 
@@ -132,6 +233,37 @@ function getResults(json) {
 			//alert("The request is complete!");
 		}
 	}); 
+}
+
+function showResultInTbl() {
+	var loghtml = "<table class='hovertable'>";
+	loghtml += ("<tr>"+"<th>Event Classes</th>"+"<th>Frequencies</th>"+"</tr>");
+	$.each(logResult, function(idx, logitem){
+		loghtml += "<tr>";
+		loghtml += ("<td align='center'>"+logitem.EventClass+"</td>");
+		loghtml += ("<td align='center'>"+logitem.Frequency+"</td>");
+		loghtml += "</tr>";
+		});
+	loghtml += "</table>";
+	$('#logtext').html(loghtml);
+}
+
+function showResultIn3DC() {
+	var eventClasses = [], frequencies = [];
+	$.each(logResult, function(idx, logitem){
+		eventClasses.push(logitem.EventClass);
+		frequencies.push(logitem.Frequency);
+	});
+	show3DChart('logtext', 'Frequencies of Event Classes', eventClasses, 'Frequency', 'Event Class', frequencies, '');
+}
+
+function showResultInLC() {
+	var eventClasses = [], frequencies = [];
+	$.each(logResult, function(idx, logitem){
+		eventClasses.push(logitem.EventClass);
+		frequencies.push(logitem.Frequency);
+	});
+	showChart('logtext', 'Frequencies of Event Classes', eventClasses, 'Frequency', 'Event Class', frequencies, '');
 }
 
 function displayResults(root) {
@@ -338,8 +470,13 @@ function onZoomChanged() {
   }
 </script>
 <div id="logarea">
-<h3>SAMMARY of the Selected Log:</h3>
-<h5 id="logtext"></h5>
+<h3>SUMMARY of the Selected Log:</h3>
+<div id="showarea">
+	<input type="button" name="Change" value="Display in 3D Chart" onClick="showResultIn3DC()"></input>
+	<input type="button" name="Change" value="Display in Line Chart" onClick="showResultInLC()"></input>
+	<input type="button" name="Change" value="Display in Table" onClick="showResultInTbl()"></input>
+</div>
+<div id="logtext"></div>
 </div>
 </div>
 </body>
