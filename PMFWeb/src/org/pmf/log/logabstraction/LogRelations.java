@@ -7,10 +7,13 @@ import java.util.Set;
 import org.pmf.util.Pair;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
+import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 
 public interface LogRelations {
 	public XLog getLog();
+	
+	public XLogInfo getSummary();
 	
 	public XEventClasses getTransitions();
 	

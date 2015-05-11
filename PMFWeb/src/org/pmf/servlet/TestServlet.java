@@ -97,7 +97,7 @@ public class TestServlet extends HttpServlet {
 		case 7:
 			logfile = "L8.xes";
 			break;
-		case 8:
+		/*case 8:
 			logfile = "L9.xes";
 			break;
 		case 9:
@@ -108,7 +108,7 @@ public class TestServlet extends HttpServlet {
 			break;
 		case 11:
 			logfile = "L12.xes";
-			break;
+			break;*/
 		default:
 			logfile = "bigger-example.xes";
 			break;

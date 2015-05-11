@@ -122,6 +122,12 @@ public abstract class AbstractLogRelations implements LogRelations {
 		// TODO Auto-generated method stub
 		return this.log;
 	}
+	
+	@Override
+	public XLogInfo getSummary() {
+		// TODO Auto-generated method stub
+		return this.logInfo;
+	}
 
 	@Override
 	public XEventClasses getTransitions() {
