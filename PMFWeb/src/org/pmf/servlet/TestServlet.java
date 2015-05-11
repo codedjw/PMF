@@ -97,18 +97,9 @@ public class TestServlet extends HttpServlet {
 		case 7:
 			logfile = "L8.xes";
 			break;
-		/*case 8:
-			logfile = "L9.xes";
+		case 8:
+			logfile = "running-two-oneloops-pmf.xes";
 			break;
-		case 9:
-			logfile = "L10.xes";
-			break;
-		case 10:
-			logfile = "L11.xes";
-			break;
-		case 11:
-			logfile = "L12.xes";
-			break;*/
 		default:
 			logfile = "bigger-example.xes";
 			break;

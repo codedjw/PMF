@@ -96,6 +96,7 @@ $(document).ready(function() {
 });
 
 function show3DChart(divId, titleText, xCat, yTitleText, seriesName, seriesData, unit) {
+	hasHChart = true;
 	var chart;
 	chart = new Highcharts.Chart({
         chart: {
@@ -134,6 +135,9 @@ function show3DChart(divId, titleText, xCat, yTitleText, seriesName, seriesData,
 					this.x +': '+ this.y + unit;
 			}
 		},
+		credits: {
+    		enabled: false // remove high chart logo hyper-link
+    	},
         series: [{
             name: seriesName,
             data: seriesData
@@ -141,7 +145,17 @@ function show3DChart(divId, titleText, xCat, yTitleText, seriesName, seriesData,
     });
 }
 
+var hasHChart = false;
+
+function destroyHChart(divId) {
+	if (hasHChart === true) {
+		var chart = $('#'+divId).highcharts(); //access from id
+		chart.destroy();
+	}
+}
+
 function showChart (divId, titleText, xCat, yTitleText, seriesName, seriesData, unit) {
+	hasHChart = true;
 	var chart;
 	chart = new Highcharts.Chart({
 		chart: {
@@ -185,6 +199,9 @@ function showChart (divId, titleText, xCat, yTitleText, seriesName, seriesData, 
 			y: 100,
 			borderWidth: 0
 		},
+		credits: {
+    		enabled: false // remove high chart logo hyper-link
+    	},
 		series: [{
 			name: seriesName,
 			data: seriesData
@@ -236,6 +253,9 @@ function getResults(json) {
 }
 
 function showResultInTbl() {
+	destroyHChart('logtext');
+	// --- render table start ---
+	hasHChart = false;
 	var loghtml = "<table class='hovertable'>";
 	loghtml += ("<tr>"+"<th>Event Classes</th>"+"<th>Frequencies</th>"+"</tr>");
 	$.each(logResult, function(idx, logitem){
@@ -249,6 +269,7 @@ function showResultInTbl() {
 }
 
 function showResultIn3DC() {
+	destroyHChart('logtext');
 	var eventClasses = [], frequencies = [];
 	$.each(logResult, function(idx, logitem){
 		eventClasses.push(logitem.EventClass);
@@ -258,6 +279,7 @@ function showResultIn3DC() {
 }
 
 function showResultInLC() {
+	destroyHChart('logtext');
 	var eventClasses = [], frequencies = [];
 	$.each(logResult, function(idx, logitem){
 		eventClasses.push(logitem.EventClass);
@@ -278,19 +300,16 @@ function displayResults(root) {
 	<option value="0" selected>Alpha Mining Algorithm</option>
 </select>
 <select id="logchoice">
-	<option value="0" selected>FILE I</option>
-	<option value="1">FILE II</option>
-	<option value="2">FILE III</option>
-	<option value="3">FILE IV</option>
-	<option value="4">FILE V</option>
-	<option value="5">FILE VI</option>
-	<option value="6">FILE VII</option>
-	<option value="7">FILE VIII</option>
-<!--<option value="8">FILE IX</option>
-    <option value="9">FILE X</option>
-	<option value="10">FILE XI</option>
-	<option value="11">FILE XII</option> -->
-	<option value="12">BIGGER DEMO</option>
+	<option value="0" selected>FILE I(Choices & Parallels)</option>
+	<option value="1">FILE II(Long-Loop)</option>
+	<option value="2">FILE III(Long-Loop)</option>
+	<option value="3">FILE IV(Two Choices Without Local Dependencies)</option>
+	<option value="4">FILE V(Parallels and Long-Loop)</option>
+	<option value="5">FILE VI(Alpha+ Cons:Redundancy)</option>
+	<option value="6">FILE VII(One-Loop)</option>
+	<option value="7">FILE VIII(Two-Loop)</option>
+	<option value="8">FILE(One-LoopX2)</option>
+	<option value="9">BIGGER DEMO</option>
 </select>
 <select id="dragchoice" style="float: right;">
 	<option value="0" selected>Active</option>
