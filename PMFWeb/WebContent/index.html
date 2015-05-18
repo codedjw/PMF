@@ -3,301 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <title>Online Process Mining</title>
-<style type="text/css">
-
-#logselectedarea {
-	width: 60%;
-	height: 50px;
-}
-#miningarea {
-	width: 100%;
-	height: 500px;
-}
-#graph {
-	width: 60%;
-	height: 100%;
-	float: left;
-	border: thin solid #ccc;
-}
-#logarea {
-	width: 37%;
-	height: 100%;
-	margin-left: 62%;
-}
-#showarea {
-	width: 100%;
-}
-#logtext {
-	width: 100%;
-	margin-top:5%;
-}
-.node {
-  cursor: pointer;
-  stroke: #3182bd;
-  stroke-width: 1.5px;
-}
-.link {
-  stroke: #000;
-  stroke-width: 3px;
-}
-.nodetext {
-  pointer-events: none;
-  font: 12px;
-  font-family:helvetica,arial;
-}
-.node.type0 {
-        fill:#fff;
-}
-.node.type1 {
-        fill:#fff;
-}
-.node.fixed {
-  		fill: #ffffe0;
-}
-table.hovertable {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #999999;
-	border-collapse: collapse;
-	width: 100%;
-}
-table.hovertable th {
-	background-color:#F0F8FF;
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #a9c6c9;
-}
-table.hovertable tr {
-	background-color:#FFFFFF;
-}
-table.hovertable td {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #a9c6c9;
-}
-th.first, tr.first {
-	width: 20%;
-}
-
-</style>
+<link rel="stylesheet" type="text/css" href="css/common.css" />
+<link rel="stylesheet" type="text/css" href="css/PNShow.css" />
+<link rel="stylesheet" type="text/css" href="css/summaryShow.css" />
+<link rel="stylesheet" type="text/css" href="css/common.css" />
+<link rel="stylesheet" type="text/css" href="css/SNShow.css" />
 <script type="text/javascript" src="jquery-2.1.0.js"></script>
 <script type="text/javascript" src="d3.js"></script>
 <script type="text/javascript" src="highcharts/highcharts.js"></script>
 <script type="text/javascript" src="highcharts/highcharts-3d.js"></script>
 <script type="text/javascript" src="highcharts/modules/exporting.js"></script>
+<script type="text/javascript" src="js/alphaGet.js"></script>
+<script type="text/javascript" src="js/summaryShow.js"></script>
+<script type="text/javascript" src="js/alphaShow.js"></script>
+<script type="text/javascript" src="js/SNHoWGet.js"></script>
+<script type="text/javascript" src="js/SNHoWShow.js"></script>
 <script>
 $(document).ready(function() {
 	var json = {logid : 0};
-	getResults(json);
+	getAlphaResults(json);
 });
 
-function show3DChart(divId, titleText, xCat, yTitleText, seriesName, seriesData, unit) {
-	hasHChart = true;
-	var chart;
-	chart = new Highcharts.Chart({
-        chart: {
-        	renderTo: divId,
-            type: 'column',
-            margin: 75,
-            options3d: {
-                enabled: true,
-                alpha: 10,
-                beta: 25,
-                depth: 70
-            }
-        },
-        title: {
-            text: titleText
-        },
-        subtitle: {
-            text: 'Source: www.pmf.org'
-        },
-        plotOptions: {
-            column: {
-                depth: 25
-            }
-        },
-        xAxis: {
-            categories: xCat
-        },
-        yAxis: {
-            title: {
-                text: yTitleText
-            }
-        },
-        tooltip: {
-			formatter: function() {
-	                return '<b>'+ this.series.name +'</b><br/>'+
-					this.x +': '+ this.y + unit;
-			}
-		},
-		credits: {
-    		enabled: false // remove high chart logo hyper-link
-    	},
-        series: [{
-            name: seriesName,
-            data: seriesData
-        }]
-    });
-}
-
-var hasHChart = false;
-
-function destroyHChart(divId) {
-	if (hasHChart === true) {
-		var chart = $('#'+divId).highcharts(); //access from id
-		chart.destroy();
+function subshow() {
+	// clear before
+	var selOpt = $("#logchoice option");  
+    selOpt.remove();
+    //////
+    var selObj = $("#logchoice");
+    console.log("AL:"+$("#miningalgorithm").val());
+	if ($("#miningalgorithm").val() == 0) {
+		selObj.append("<option value='"+0+"' selected>"+"FILE I(Choices & Parallels)"+"</option>");
+		selObj.append("<option value='"+1+"'>"+"FILE II(Long-Loop)"+"</option>");
+		selObj.append("<option value='"+2+"'>"+"FILE III(Long-Loop)"+"</option>");
+		selObj.append("<option value='"+3+"'>"+"FILE IV(Two Choices Without Local Dependencies)"+"</option>");
+		selObj.append("<option value='"+4+"'>"+"FILE V(Parallels and Long-Loop)"+"</option>");
+		selObj.append("<option value='"+5+"'>"+"FILE VI(Alpha+ Cons:Redundancy)"+"</option>");
+		selObj.append("<option value='"+6+"'>"+"FILE VII(One-Loop)"+"</option>");
+		selObj.append("<option value='"+7+"'>"+"FILE VIII(Two-Loop)"+"</option>");
+		selObj.append("<option value='"+8+"'>"+"FILE(One-LoopX2)"+"</option>");
+		selObj.append("<option value='"+9+"'>"+"BIGGER DEMO"+"</option>");
+		selObj.append("<option value='"+10+"'>"+"Repair Example"+"</option>");
+	} else {
+		selObj.append("<option value='"+0+"' selected>"+"Repair Example"+"</option>");
+		selObj.append("<option value='"+1+"'>"+"Reviewing Example"+"</option>");
+		selObj.append("<option value='"+2+"'>"+"Teleclaims Example"+"</option>");
 	}
 }
 
-function showChart (divId, titleText, xCat, yTitleText, seriesName, seriesData, unit) {
-	hasHChart = true;
-	var chart;
-	chart = new Highcharts.Chart({
-		chart: {
-			renderTo: divId,
-			defaultSeriesType: 'line',
-			marginRight: 130,
-			marginBottom: 25
-		},
-		title: {
-			text: titleText,
-			x: -20 //center
-		},
-		subtitle: {
-			text: 'Source: www.pmf.org',
-			x: -20
-		},
-		xAxis: {
-			categories: xCat
-		},
-		yAxis: {
-			title: {
-				text: yTitleText
-			},
-			plotLines: [{
-				value: 0,
-				width: 1,
-				color: '#808080'
-			}]
-		},
-		tooltip: {
-			formatter: function() {
-	                return '<b>'+ this.series.name +'</b><br/>'+
-					this.x +': '+ this.y + unit;
-			}
-		},
-		legend: {
-			layout: 'vertical',
-			align: 'right',
-			verticalAlign: 'top',
-			x: -10,
-			y: 100,
-			borderWidth: 0
-		},
-		credits: {
-    		enabled: false // remove high chart logo hyper-link
-    	},
-		series: [{
-			name: seriesName,
-			data: seriesData
-		}]
-	});
+function calculate() {
+	if ($("#miningalgorithm").val() == 0) {
+		doAlpha();
+	} else {
+		doSNHoW();
+	}
 }
 
-function doAlpha() {
-	var json = {logid : $("#logchoice").val()};
-	getResults(json);
-}
-
-var logResult;
-
-function getResults(json) {
-	var jsonstr = JSON.stringify(json);
-	$.ajax({
-		url : "TestServlet",
-		data : {
-			"logJson" : jsonstr
-			},
-		type : "POST",
-		dataType : "json",
-		contentType: "application/x-www-form-urlencoded; charset=utf-8", 
-		success : function(json) {
-			// send back a json object
-			if (json.status == "OK") {
-				$('#dragchoice').val("0");
-				displayResults(json.result);
-				logResult = json.log;
-				showResultIn3DC();
-			}
- 		},
-
-		// code to run if the request fails;
-		// the raw request and status codes are passed to the function
-		error : function(xhr, status, errThrown) {
-			alert("Sorry, there was a problem!");
-			console.log("Error: " + errThrowm);
-			console.log("Status: " + status);
-			console.dir(xhr); 
-		},
-
-		// code to run regardless of success or failure
-		complete :function(xhr, status) {
-			//alert("The request is complete!");
-		}
-	}); 
-}
-
-function showResultInTbl() {
-	destroyHChart('logtext');
-	// --- render table start ---
-	hasHChart = false;
-	var loghtml = "<table class='hovertable'>";
-	loghtml += ("<tr>"+"<th>Event Classes</th>"+"<th>Frequencies</th>"+"</tr>");
-	$.each(logResult, function(idx, logitem){
-		loghtml += "<tr>";
-		loghtml += ("<td align='center'>"+logitem.EventClass+"</td>");
-		loghtml += ("<td align='center'>"+logitem.Frequency+"</td>");
-		loghtml += "</tr>";
-		});
-	loghtml += "</table>";
-	$('#logtext').html(loghtml);
-}
-
-function showResultIn3DC() {
-	destroyHChart('logtext');
-	var eventClasses = [], frequencies = [];
-	$.each(logResult, function(idx, logitem){
-		eventClasses.push(logitem.EventClass);
-		frequencies.push(logitem.Frequency);
-	});
-	show3DChart('logtext', 'Frequencies of Event Classes', eventClasses, 'Frequency', 'Event Class', frequencies, '');
-}
-
-function showResultInLC() {
-	destroyHChart('logtext');
-	var eventClasses = [], frequencies = [];
-	$.each(logResult, function(idx, logitem){
-		eventClasses.push(logitem.EventClass);
-		frequencies.push(logitem.Frequency);
-	});
-	showChart('logtext', 'Frequencies of Event Classes', eventClasses, 'Frequency', 'Event Class', frequencies, '');
-}
-
-function displayResults(root) {
-	update(root);
-}
 </script>
 </head>
 <body>
 <div id="logselectedarea">
 <h3>Choose a log file:</h3>
-<select id="miningalgorithm">
+<select id="miningalgorithm" onchange="subshow()">
 	<option value="0" selected>Alpha Mining Algorithm</option>
+	<option value="1">SNM Algorithm(Handover of Work)</option>
 </select>
 <select id="logchoice">
 	<option value="0" selected>FILE I(Choices & Parallels)</option>
@@ -310,18 +78,17 @@ function displayResults(root) {
 	<option value="7">FILE VIII(Two-Loop)</option>
 	<option value="8">FILE(One-LoopX2)</option>
 	<option value="9">BIGGER DEMO</option>
+	<option value="10">Repair Example</option>
 </select>
 <select id="dragchoice" style="float: right;">
 	<option value="0" selected>Active</option>
 	<option value="1">Fixed</option>
 </select>
-<input type="button" name="Submit" value="Choose" onClick="doAlpha()" />
+<input type="button" name="Submit" value="Choose" onClick="calculate()" />
 </div>
 <div id="miningarea">
 <div id="graph"></div>
 <script>
-var r = 30;
-var s = 50;
 var width = $("#graph").width(), height = $("#graph").height();
 
 var data = {
@@ -333,11 +100,8 @@ var data = {
 };
 
 var force = d3.layout.force()
-	.gravity(.05)
-	.linkDistance(80)
-	.charge(-800)
 	.size([width,height])
-	.on("tick", tick);;
+	.on("tick", tick);
 
 var zoom = d3.behavior.zoom()
 						.scaleExtent([0.4, 5])
@@ -355,149 +119,6 @@ var svgg = svg.append("svg:g")
     	.attr("height", height);
 
 var link = svgg.append('svg:g').selectAll(".link"), node = svgg.append('svg:g').selectAll(".node");
-
-var root;
-
-function update(datajson) {
-
-	root = datajson;
-
-	svgg.selectAll("*").remove();
-
-	svgg.append("svg:defs").append("marker")
-	.attr("id", "arrowhead")
-	.attr("refX", 17 + 3) //must be smarter way to calculate shift
-	.attr("refY", 2)
-	.attr("markerWidth", 6)
-	.attr("markerHeight", 4)
-	.attr("orient", "auto")
-	.append("path")
-	.attr("d", "M 0,0 V 4 L6,2 Z"); //this is actual shape for arrowhead
-
-	// Markers
-    /* svgg.append("svg:defs").selectAll("marker")
-        .data(['regular'])
-      .enter().append("svg:marker")
-        .attr("id", String)
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 15)
-        .attr("refY", -1.5)
-        .attr("markerWidth", 6)
-        .attr("markerHeight", 6)
-        .attr("orient", "auto")
-      .append("svg:path")
-        .attr("d", "M0,-5L10,0L0,5"); */
-	
-	link = svgg.append('svg:g').selectAll(".link");
-	node = svgg.append('svg:g').selectAll(".node");
-	
-	var nodes = root.nodes;
-	var links = root.links;
-
-	// Restart the force layout
-	force.nodes(nodes)
-		.links(links)
-		.start();
-
-	// Update the links…
-	link = link.data(links);
-
-	// Exit any old links.
-	link.exit().remove();
-
-	// Enter any new links.
-	link.enter().insert("line", ".node")
-	    .attr("class", "link")
-	    .attr("x1", function(d) { return d.source.x; })
-	    .attr("y1", function(d) { return d.source.y; })
-	    .attr("x2", function(d) { return d.target.x; })
-	    .attr("y2", function(d) { return d.target.y; })
-	    .attr("marker-end", function (d) {
-    		if (d.type == 1) {
-        		return "url(#arrowhead)"
-    		} else {
-        		return " "
-    	   	};
-	    });
-
-	// Update the nodes…
-    node = node.data(nodes);
-
-	// Exit any old nodes.
-	node.exit().remove();
-
-	var drag = force.drag()
-	  				.on("dragstart", function(d,i){
-	  					//拖拽开始后设定被拖拽对象为固定
-	  					// solve zoom and drag conflict
-	  					d3.event.sourceEvent.stopPropagation();
-		  				d.fixed = true;
-		  			})
-		  			.on("dragend", function(d,i){
-						d.fixed = ($('#dragchoice').val() == 0) ? false : true;
-						d3.select(this).selectAll(".node").classed("fixed", d.fixed);
-			  			});
-	  
-	node.enter().append("svg:g")
-	  	.attr("class", function(d){
-			if (d.type == "PN_TRANSITION") {
-				return "transition node";
-			} else {
-				return "circle node";
-			}
-	     })
-		 .call(drag);
-
-	d3.selectAll(".transition").append("rect")
-	  	.attr("x", function(d) { return -s/2; })
-    	.attr("y", function(d) { return -s/2; })
-    	.attr("width", s)
-    	.attr("height", s)
-    	.attr("class", "node type"+0);
-
-	d3.selectAll(".circle").append("circle")
-	  	.attr("r", r)
-  		.attr("class", "node type"+1);
-
-	node.append("svg:text")
-	    .attr("class", "nodetext")
-	    .attr("dx", 0)
-	    .attr("dy", ".50em")
-	    .attr("text-anchor", "middle")
-	    .text(function (d) {
-	    return d.label;
-		});
-
-    //标记鼠标悬停的标签
-	node.append("title")
-	    .text(function(d) {
-			  return d.detail; 
-	 });
-
-	d3.select(window).on("resize", resize);
-}
-
-function resize() {
-	width = $("#graph").width(), height = $("#graph").height();
-	svg.attr("width", width).attr("height", height);
-	svgg.attr("width", width).attr("height", height);
-	force.size([width, height]).resume();
-}
-
-function tick() {
-	  link.attr("x1", function(d) { return d.source.x; })
-	      .attr("y1", function(d) { return d.source.y; })
-	      .attr("x2", function(d) { return d.target.x; })
-	      .attr("y2", function(d) { return d.target.y; });
-
-	  node.attr("transform", function (d) {
-	      return "translate(" + d.x + "," + d.y + ")";
-	  });
-}
-
-function onZoomChanged() {
-    svgg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
-  }
 </script>
 <div id="logarea">
 <h3>SUMMARY of the Selected Log:</h3>
