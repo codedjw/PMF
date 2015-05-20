@@ -21,6 +21,7 @@
 <script>
 $(document).ready(function() {
 	var json = {logid : 0};
+	subshow();
 	getAlphaResults(json);
 });
 
@@ -43,6 +44,8 @@ function subshow() {
 		selObj.append("<option value='"+8+"'>"+"FILE(One-LoopX2)"+"</option>");
 		selObj.append("<option value='"+9+"'>"+"BIGGER DEMO"+"</option>");
 		selObj.append("<option value='"+10+"'>"+"Repair Example"+"</option>");
+		selObj.append("<option value='"+11+"'>"+"Reviewing"+"</option>");
+		selObj.append("<option value='"+12+"'>"+"Teleclaims"+"</option>");
 	} else {
 		selObj.append("<option value='"+0+"' selected>"+"Repair Example"+"</option>");
 		selObj.append("<option value='"+1+"'>"+"Reviewing Example"+"</option>");
@@ -68,17 +71,6 @@ function calculate() {
 	<option value="1">SNM Algorithm(Handover of Work)</option>
 </select>
 <select id="logchoice">
-	<option value="0" selected>FILE I(Choices & Parallels)</option>
-	<option value="1">FILE II(Long-Loop)</option>
-	<option value="2">FILE III(Long-Loop)</option>
-	<option value="3">FILE IV(Two Choices Without Local Dependencies)</option>
-	<option value="4">FILE V(Parallels and Long-Loop)</option>
-	<option value="5">FILE VI(Alpha+ Cons:Redundancy)</option>
-	<option value="6">FILE VII(One-Loop)</option>
-	<option value="7">FILE VIII(Two-Loop)</option>
-	<option value="8">FILE(One-LoopX2)</option>
-	<option value="9">BIGGER DEMO</option>
-	<option value="10">Repair Example</option>
 </select>
 <select id="dragchoice" style="float: right;">
 	<option value="0" selected>Active</option>

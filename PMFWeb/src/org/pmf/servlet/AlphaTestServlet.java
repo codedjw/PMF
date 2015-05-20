@@ -7,11 +7,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,22 +26,19 @@ import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.pmf.graph.petrinet.Petrinet;
 import org.pmf.graph.petrinet.Place;
-import org.pmf.log.logabstraction.AlphaMinerLogRelationImpl;
-import org.pmf.log.logabstraction.LogRelations;
 import org.pmf.tools.alphaminer.AlphaMiner;
-import org.pmf.util.AttributeMap;
 
 /**
- * Servlet implementation class TestServlet
+ * Servlet implementation class AlphaTestServlet
  */
-@WebServlet("/TestServlet")
-public class TestServlet extends HttpServlet {
+@WebServlet("/AlphaTestServlet")
+public class AlphaTestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public TestServlet() {
+    public AlphaTestServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -103,8 +96,14 @@ public class TestServlet extends HttpServlet {
 		case 9:
 			logfile = "bigger-example.xes";
 			break;
-		default:
+		case 10:
 			logfile = "repairExample.xes";
+			break;
+		case 11:
+			logfile = "reviewing.xes";
+			break;
+		default:
+			logfile = "teleclaims.xes";
 			break;
 		}
 		

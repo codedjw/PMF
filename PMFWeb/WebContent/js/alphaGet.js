@@ -6,7 +6,7 @@ var logResult;
 function getAlphaResults(json) {
 	var jsonstr = JSON.stringify(json);
 	$.ajax({
-		url : "TestServlet",
+		url : "AlphaTestServlet",
 		data : {
 			"logJson" : jsonstr
 			},
