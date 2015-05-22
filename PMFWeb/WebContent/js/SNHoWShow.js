@@ -8,28 +8,36 @@ function displaySNHoWResults(root) {
 
 	svgg.selectAll("*").remove();
 
-	/*svgg.append("svg:defs").append("marker")
-	.attr("id", "arrowhead")
-	.attr("refX", 17 + 3) //must be smarter way to calculate shift
-	.attr("refY", 2)
-	.attr("markerWidth", 6)
-	.attr("markerHeight", 4)
-	.attr("orient", "auto")
-	.append("path")
-	.attr("d", "M 0,0 V 4 L6,2 Z"); //this is actual shape for arrowhead*/
-
-	/* svgg.append("svg:defs").selectAll("marker")
-    .data(["suit", "licensing", "resolved"])
-  	.enter().append("marker")
-    .attr("id", function(d) { return d; })
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -1.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .attr("orient", "auto")
-  	.append("path")
-    .attr("d", "M0,-5L10,0L0,5"); */
+//	svgg.append("svg:defs").append("marker")
+//	.attr("id", "arrowhead")
+//	.attr("refX", 17 + 3) //must be smarter way to calculate shift
+//	.attr("refY", 2)
+//	.attr("markerWidth", 6)
+//	.attr("markerHeight", 4)
+//	.attr("orient", "auto")
+//	.append("path")
+//	.attr("d", "M 0,0 V 4 L6,2 Z"); //this is actual shape for arrowhead
+	
+	var markerStyle = [
+	                   {id: 0, name: "arrow_normal", color: "#BBBBBB"}, 
+	                   {id: 1, name:"arrow_red", color:"red"}
+	                   ];
+	
+	svgg.append("svg:defs").selectAll("marker")
+	.data(markerStyle)
+	.enter()
+	.append("svg:marker")
+	.attr("id", function(d){ return 'marker_' + d.name})
+    .attr("viewBox","0 -5 10 10")
+    .attr("refX","24")
+    .attr("refY","0")
+    .attr("markerUnits","strokeWidth")
+    .attr("markerWidth","9")
+    .attr("markerHeight","5")
+    .attr("orient","auto")
+    .append("svg:path")
+    .attr("d","M 0 -5 L 10 0 L 0 5 z")
+    .attr("fill", function(d){return d.color});
 	
 	link = svgg.append('svg:g').selectAll(".link");
 	node = svgg.append('svg:g').selectAll(".node");
@@ -111,13 +119,13 @@ function displaySNHoWResults(root) {
   		.attr("class", "snnode type"+1);
 
 	// Enter any new links.
-	link.enter().append("path")
+	link.enter().append("line")
 	    .attr("class", "snlink")
-	    .attr("marker-end", "url(#suit)")
+	    .attr("marker-end", "url(#marker_arrow_normal)")
 	    .style("stroke-width", function(d){
 		var val = d.detail*1;
-		if (lmax == 0) return 0.5;
-		else return (0.5+(val/lmax*2));
+		if (lmax == 0) return 0.8;
+		else return (0.8+(val/lmax*1));
     })
 
 	node.append("svg:text")
@@ -170,12 +178,15 @@ function displaySNHoWResults(root) {
             return thisOpacity;
         });
 
-                link.style("stroke-opacity", function(o) {
+                link.style("opacity", function(o) {
                     return o.source === d /* || o.target === d */ ? 1 : opacity;
                 })
                 
                 .style("stroke", function(o) {
                     return o.source === d /* || o.target === d */ ? color : "#c0c0c0" ;
+                })
+                .attr("marker-end", function(o){
+                	return color === "red" && (o.source === d /* || o.target === d */) ? "url(#marker_arrow_red)" : "url(#marker_arrow_normal)" ;
                 });
             };
             
@@ -184,33 +195,14 @@ function displaySNHoWResults(root) {
 	d3.select(window).on("resize", resize);
 }
 
-function resize() {
-	width = $("#graph").width(), height = $("#graph").height();
-	svg.attr("width", width).attr("height", height);
-	svgg.attr("width", width).attr("height", height);
-	force.size([width, height]).resume();
-}
-
-function tick() {
-		link.attr("d", linkArc);
-	
-	  link.attr("x1", function(d) { return d.source.x; })
-	      .attr("y1", function(d) { return d.source.y; })
-	      .attr("x2", function(d) { return d.target.x; })
-	      .attr("y2", function(d) { return d.target.y; });
-
-	  node.attr("transform", function (d) {
-	      return "translate(" + d.x + "," + d.y + ")";
-	  });
-}
-
 function linkArc(d) {
-	  var dx = d.target.x - d.source.x,
-	      dy = d.target.y - d.source.y,
-	      dr = Math.sqrt(dx * dx + dy * dy);
-	  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+	var dx = d.target.x - d.source.x,
+    dy = d.target.y - d.source.y,
+    dr = Math.sqrt(dx * dx + dy * dy);
+	return "M" + 
+    	d.source.x + "," + 
+    	d.source.y + "A" + 
+    	dr + "," + dr + " 0 0,1 " + 
+    	d.target.x + "," + 
+    	d.target.y;
 }
-
-function onZoomChanged() {
-    svgg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
-  }

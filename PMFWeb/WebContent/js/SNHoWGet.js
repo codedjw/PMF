@@ -18,6 +18,7 @@ function getSNHoWResults(json) {
 		success : function(json) {
 			// send back a json object
 			if (json.status == "OK") {
+				status = "HoWMiner";
 				$('#dragchoice').val("0");
 				displaySNHoWResults(json.result);
 				logResult = json.log;

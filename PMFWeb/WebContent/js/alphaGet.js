@@ -16,6 +16,7 @@ function getAlphaResults(json) {
 		success : function(json) {
 			// send back a json object
 			if (json.status == "OK") {
+				status = "AlphaMiner";
 				$('#dragchoice').val("0");
 				displayAlphaResults(json.result);
 				logResult = json.log;
