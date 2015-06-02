@@ -1,0 +1,25 @@
+.snnode {
+  cursor: pointer;
+  stroke: #3182bd;
+  stroke-width: 1px;
+}
+.snlink {
+  fill: none;
+  stroke: #c0c0c0;
+  stroke-width: 0.5px;
+}
+.snnode.text {
+  pointer-events: none;
+  font-size: 10px;
+  font-family:sans-serif;
+  /* text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff; */
+}
+.snnode.type0 {
+        fill:#fff;
+}
+.snnode.type1 {
+        fill:#fff;
+}
+.snnode.fixed {
+  		fill: #ffffe0;
+}

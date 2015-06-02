@@ -1,0 +1,23 @@
+.node {
+  cursor: pointer;
+  stroke: #3182bd;
+  stroke-width: 1.5px;
+}
+.link {
+  stroke: #000;
+  stroke-width: 3px;
+}
+.node.text {
+  pointer-events: none;
+  font-size: 15px;
+  font-family:helvetica,arial;
+}
+.node.type0 {
+        fill:#fff;
+}
+.node.type1 {
+        fill:#fff;
+}
+.node.fixed {
+  		fill: #ffffe0;
+}
