@@ -76,7 +76,7 @@ public abstract class AbstractLogRelations implements LogRelations {
     
     protected abstract void calculateLogRelations();
     
-    protected abstract void calculateMetrics();
+    protected abstract void calculateMatrices();
     
     /**
      * Makes dfrPairs succession relations, as well as two-loop relations, i.e.

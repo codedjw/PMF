@@ -38,11 +38,11 @@ public class AlphaMinerLogRelationImpl extends AbstractLogRelations implements
 		// TODO Auto-generated method stub
 		this.parallelMatrix = new int[this.transitions.size()][this.transitions.size()];
 		this.fillDirectSuccessionMatrices();
-		this.calculateMetrics();
+		this.calculateMatrices();
 	}
 
 	@Override
-	protected void calculateMetrics() {
+	protected void calculateMatrices() {
 		// TODO Auto-generated method stub
 		for (int fromIndex = 0; fromIndex < this.absoluteDirectlyFollowMatrix.length; fromIndex++) {
             for (int toIndex = 0; toIndex < this.absoluteDirectlyFollowMatrix.length; toIndex++) {
