@@ -46,7 +46,7 @@ public class AlphaMinerLogRelationImpl extends AbstractLogRelations implements
             for (int toIndex = 0; toIndex < this.absoluteDirectlyFollowMatrix.length; toIndex++) {
                 if (this.absoluteDirectlyFollowMatrix[fromIndex][toIndex] > 0) {
                     if (this.absoluteDirectlyFollowMatrix[toIndex][fromIndex] > 0) {
-                        if (this.absoluteLengthTwoLoopMatrix[fromIndex][toIndex] > 0 || this.absoluteLengthTwoLoopMatrix[toIndex][fromIndex] > 0) {
+                        if (this.absoluteLengthTwoLoopMatrix[fromIndex][toIndex] > 0 && this.absoluteLengthTwoLoopMatrix[toIndex][fromIndex] > 0) {
                             this.causalMatrix[fromIndex][toIndex] = 1;
                             this.causalMatrix[toIndex][fromIndex] = 1;
                         } else {
