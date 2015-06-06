@@ -10,6 +10,12 @@
         <link href="ALTE-template/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <!-- Ionicons -->
         <link href="ALTE-template/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+        <!-- Ion Slider -->
+        <link href="ALTE-template/css/ionslider/ion.rangeSlider.css" rel="stylesheet" type="text/css" />
+        <!-- ion slider Nice -->
+        <link href="ALTE-template/css/ionslider/ion.rangeSlider.skinNice.css" rel="stylesheet" type="text/css" />
+        <!-- bootstrap slider -->
+        <link href="ALTE-template/css/bootstrap-slider/slider.css" rel="stylesheet" type="text/css" />
         <!-- Theme style -->
         <link href="ALTE-template/css/AdminLTE.css" rel="stylesheet" type="text/css" />
 
@@ -347,7 +353,45 @@
             
                 <div class="body bg-gray">
                 <div class="form-group">
-                <form id="fileForm">
+                <form id="fileForm" class="form-horizontal">
+                <div class="form-group">
+					<label class="col-sm-2 control-label">Depth</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="depth" name="depth">
+				</div>
+				</div>
+				<div class="form-group">
+					<small class="col-sm-12">Depth: Calculation depth factor specifies maximum degree of causality.</small>
+				</div>
+                <div class="form-group">
+					<label class="col-sm-2 control-label">Beta</label>
+				<div class="col-sm-10">
+					<input id="range" name="beta" value=" " />
+				</div>
+				</div>
+				<div class="form-group">
+					<small class="col-sm-12">Beta: Causality fall factor. Beta needs to be in (0,1].</small>
+				</div>
+				
+				<div class="form-group">
+					<div class="col-sm-offset-0 col-sm-12">
+						<div class="checkbox">
+							<label>
+								<input name="cm" type="checkbox"> Consider multiple transfers within one instance
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-0 col-sm-12">
+						<div class="checkbox">
+							<label>
+								<input name="cc" type="checkbox"> Consider causal relations derived by Alpha+ Alogorithm
+							</label>
+						</div>
+					</div>
+				</div>
+				
                 <input id="lefile" type="file" name="file" style="display:none">
                 </form>
                 <div class="input-group">
@@ -355,7 +399,7 @@
   					<div class="input-group-btn">
   						<button class="btn bg-light-blue"  onclick="$('input[id=lefile]').click();"><i class="fa fa-plus"></i></button>
   					</div>
-  					</div>
+  				</div>
   					<script type="text/javascript">
 					$('input[id=lefile]').change(function() {
 						var str = $(this).val();
@@ -377,6 +421,7 @@
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
+  
 
 
         <script src="ALTE-template/js/jquery-ui-1.10.3.min.js" type="text/javascript"></script>
@@ -400,6 +445,10 @@
         <script src="ALTE-template/js/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js" type="text/javascript"></script>
         <!-- iCheck -->
         <script src="ALTE-template/js/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+        <!-- Ion Slider -->
+        <script src="ALTE-template/js/plugins/ionslider/ion.rangeSlider.min.js" type="text/javascript"></script>
+        <!-- Bootstrap slider -->
+        <script src="ALTE-template/js/plugins/bootstrap-slider/bootstrap-slider.js" type="text/javascript"></script>
 
         <!-- AdminLTE App -->
         <script src="ALTE-template/js/AdminLTE/app.js" type="text/javascript"></script>
@@ -413,6 +462,14 @@
             zIndex: 999999
         }).disableSelection();
         $(".box-header, .nav-tabs").css("cursor","move");
+        $("#range").ionRangeSlider({
+            min: 0,
+            max: 1,
+            type: 'single',
+            step: 0.01,
+            postfix: "",
+            grid: false
+        });
         </script>   
     </body>
 </html>
