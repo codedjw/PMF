@@ -62,9 +62,13 @@
 
 	            form.attr("target", "postiframe");
 	            form.attr("file", $('#lefile').val());
-	            if (!checkExtension($('input[id=lefile]').val())) {
-						return;
-		            }
+	            var ret = true;
+	            ret = (checkExtension($('input[id=lefile]').val()) == false) ? checkExtension($('input[id=lefile]').val()) : ret;
+	            ret = (checkDepth() == false) ? checkDepth() : ret;
+	            ret = (checkBeta() == false) ? checkBeta() : ret;
+	            if (!ret) {
+					return;
+		        }
 	            form.submit();
 
 	            $("#postiframe").load(function () {
@@ -358,6 +362,9 @@
 					<label class="col-sm-2 control-label">Depth</label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" id="depth" name="depth">
+					<div id="warning-depth" style="display:none;">
+   						<small class="text-danger"><i class="fa fa-warning"></i>&nbsp;Depth is an integer greater than 0.</small>
+   					</div>
 				</div>
 				</div>
 				<div class="form-group">
@@ -367,6 +374,9 @@
 					<label class="col-sm-2 control-label">Beta</label>
 				<div class="col-sm-10">
 					<input id="range" name="beta" value=" " />
+					<div id="warning-beta" style="display:none;">
+   						<small class="text-danger"><i class="fa fa-warning">&nbsp;Beta is greater than 0.</i></small>
+   					</div>
 				</div>
 				</div>
 				<div class="form-group">
@@ -406,12 +416,18 @@
 						var arr=str.split('\\');//注split可以用字符或字符串分割 
 						var name=arr[arr.length-1];//这就是要取得的图片名称 
 						checkExtension(name);
-   					$('#fileCover').val(name);
+   						$('#fileCover').val(name);
 					});
+					/* $('input[id=depth]').change(function(){
+						checkDepth();
+					});
+					$('input[id=range]').change(function(){
+						checkBeta();
+					}); */
 					</script>
    				</div>
    				<div id="warning" class="form-group" style="display:none;">
-   					<label class="text-danger"><i class="fa fa-warning"></i> .xes FILE ONLY!!!</label>
+   					<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.xes FILE ONLY!!!</label>
    				</div>
                 </div>
                 <div class="footer">                  
@@ -470,6 +486,35 @@
             postfix: "",
             grid: false
         });
+        function checkDepth() {
+            var ret = true;
+			/* check depth */
+            var type="^[0-9]*[1-9][0-9]*$"; 
+            var reg = new RegExp(type); 
+            var depth = $('input[id=depth]').val();
+		    if (depth.match(reg) == null) {
+				ret = false;
+				$("#warning-depth").show();
+			} else {
+				ret = true;
+				$("#warning-depth").hide();
+			}
+			return ret;
+        }
+
+        function checkBeta() {
+        	/* check beta */
+        	var ret = true;
+			var beta = $('input[id=range]').val();
+			if (beta <= 0) {
+				ret = false;
+				$("#warning-beta").show();
+			} else {
+				ret = true;
+				$("#warning-beta").hide();
+			}
+			return ret;
+        }
         </script>   
     </body>
 </html>

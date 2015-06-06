@@ -16,15 +16,19 @@ public class OperationFactory {
 		
 		switch(type) {
 		case SNMiningOptions.HANDOVER_OF_WORK + SNMiningOptions.CONSIDER_CAUSALITY + SNMiningOptions.CONSIDER_MULTIPLE_TRANSFERS:
+			System.out.println("HandOverCCIDCM");
 			operation = new HandOverCCIDCM(log);
 			break;
 		case SNMiningOptions.HANDOVER_OF_WORK + SNMiningOptions.CONSIDER_CAUSALITY:
+			System.out.println("HandOverCCIDIM");
 			operation = new HandOverCCIDIM(log);
 			break;
 		case SNMiningOptions.HANDOVER_OF_WORK + SNMiningOptions.CONSIDER_MULTIPLE_TRANSFERS:
+			System.out.println("HandOverICIDCM");
 			operation = new HandOverICIDCM(log);
 			break;
 		case SNMiningOptions.HANDOVER_OF_WORK:
+			System.out.println("HandOverICIDIM");
 			operation = new HandOverICIDIM(log);
 			break;
 		default:
