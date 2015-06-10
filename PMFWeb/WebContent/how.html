@@ -40,6 +40,7 @@
         <script type="text/javascript" src="new/js/SNHoWShow.js"></script>
         <script type="text/javascript" src="new/js/commonShow.js"></script>
         <script type="text/javascript" src="new/js/summaryShow.js"></script>
+        <script type="text/javascript" src="new/js/util.js"></script>
     </head>
     <body class="skin-blue">
     	<script type="text/javascript">
@@ -63,7 +64,7 @@
 	            form.attr("target", "postiframe");
 	            form.attr("file", $('#lefile').val());
 	            var ret = true;
-	            ret = (checkExtension($('input[id=lefile]').val()) == false) ? checkExtension($('input[id=lefile]').val()) : ret;
+	            ret = (checkExtension($('input[id=lefile]').val(), 'xes', '#warning') == false) ? checkExtension($('input[id=lefile]').val(), 'xes', '#warning') : ret;
 	            ret = (checkDepth() == false) ? checkDepth() : ret;
 	            ret = (checkBeta() == false) ? checkBeta() : ret;
 	            if (!ret) {
@@ -407,7 +408,7 @@
                 <div class="input-group">
   					<input id="fileCover" class="form-control" placeholder="Choose your log..." readonly/>
   					<div class="input-group-btn">
-  						<button class="btn bg-light-blue"  onclick="$('input[id=lefile]').click();"><i class="fa fa-plus"></i></button>
+  						<button type="button" class="btn bg-light-blue"  onclick="$('input[id=lefile]').click();"><i class="fa fa-plus"></i></button>
   					</div>
   				</div>
   					<script type="text/javascript">
@@ -415,7 +416,7 @@
 						var str = $(this).val();
 						var arr=str.split('\\');//注split可以用字符或字符串分割 
 						var name=arr[arr.length-1];//这就是要取得的图片名称 
-						checkExtension(name);
+						checkExtension(name, 'xes', '#warning');
    						$('#fileCover').val(name);
 					});
 					/* $('input[id=depth]').change(function(){
