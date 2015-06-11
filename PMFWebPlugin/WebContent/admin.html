@@ -220,60 +220,8 @@
                     </div><!-- /.row -->
                     <!-- quick email widget -->
                    <div class="row">
-                   		  <section class="col-lg-6 connectedSortable">
-                   		  <div id="upload" class="box box-info">
-                                <div class="box-header">
-                                    <i class="fa fa-envelope"></i>
-                                    <h3 class="box-title">Upload new plugin</h3>
-                                    <!-- tools box -->
-                                    <div class="pull-right box-tools">
-                                        <button class="btn btn-info btn-sm pull-right" data-widget='collapse' data-toggle="tooltip" title="Collapse" style="margin-right: 5px;"><i class="fa fa-minus"></i></button>
-                                    </div><!-- /. tools -->
-                                </div>
-                                <div class="box-body">
-                                    <form action="#" method="post">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="pluginname" placeholder="Plugin Name"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="developer" placeholder="Developer"/>
-                                        </div>
-                                        <div class="form-group">
-                                        	<input id="lefile" type="file" name="file" style="display: none;">
-                                        </div>
-                                        <div class="form-group">
-                                        	<div class="input-group">
-  											<input id="fileCover" class="form-control" placeholder="Choose your plugin..." readonly/>
-  											<div class="input-group-btn">
-  												<button type="button" class="btn btn-info" onclick="$('input[id=lefile]').click();"><i class="fa fa-plus"></i></button>
-  											</div>
-  											</div>
-  											<div id="warning" class="form-group" style="display:none;">
-   												<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.zip FILE ONLY!!!</label>
-   											</div>
-                                        </div>
-  										<script type="text/javascript">
-											$('input[id=lefile]').change(function() {
-												var str = $(this).val();
-												var arr=str.split('\\');//注split可以用字符或字符串分割 
-												var name=arr[arr.length-1];//这就是要取得的图片名称 
-												checkExtension(name, 'zip', '#warning');
-   												$('#fileCover').val(name);
-											});
-					
-										</script> 	
-                                        <div>
-                                            <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="box-footer clearfix">
-                                    <button class="pull-right btn btn-default" id="sendEmail">Upload <i class="fa fa-arrow-circle-up"></i></button>
-                                </div>
-                            </div>
-                        </section>
-                        <section class="col-lg-6 connectedSortable">
-                        	<!-- Custom tabs (Charts with tabs)-->
+                   		  <section class="col-lg-12 connectedSortable">
+                   		  <!-- Custom tabs (Charts with tabs)-->
                             <div class="nav-tabs-custom" id="inspect">
                                 <!-- Tabs within a box -->
                                 <ul class="nav nav-tabs pull-right">
@@ -287,11 +235,104 @@
                                     <div class="chart tab-pane active" id="owned-chart" style="position: relative; height: 400px;"></div>
                                 </div>
                             </div><!-- /.nav-tabs-custom -->
-                        </section>    
-                   </div>
-                   <div class="row">
-                   		<section class="col-lg-12">
-                   			<div id="upload" class="box box-info">
+                            
+                   		  <div id="upload" class="box box-info">
+                                <div class="box-header">
+                                    <i class="fa fa-envelope"></i>
+                                    <h3 class="box-title">Upload new plugin</h3>
+                                    <!-- tools box -->
+                                    <div class="pull-right box-tools">
+                                        <button class="btn btn-info btn-sm pull-right" data-widget='collapse' data-toggle="tooltip" title="Collapse" style="margin-right: 5px;"><i class="fa fa-minus"></i></button>
+                                    </div><!-- /. tools -->
+                                </div>
+                                <div class="box-body">
+                                    <form id="uploadForm">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="pluginName" placeholder="Plugin Name"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="developer" placeholder="Developer"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <select name="category" class="form-control">
+												<option value="0" selected>Control-flow Discovery</option>
+												<option value="1">Social-network Discovery</option>
+											</select>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="serviceClass" placeholder="Service Class"/>
+                                        </div>
+                                        <div class="form-group">
+											<small>Service Class (<b>Implementation of PluginService Interface</b>). 
+											Input the name like: <b>org.pmf.tools.alphaminer.AlphaPluginService</b></small>
+										</div>
+                                        <div class="form-group">
+                                        	<div class="input-group">
+  											<input type="text" class="form-control" id="apiKey" name="apiKey" placeholder="Input the ApiKey or Generate one..."/>
+  											<div class="input-group-btn">
+  												<button type="button" class="btn btn-info" onclick="getApiKey();"><i class="fa fa-plus"></i></button>
+  											</div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                        	<input id="jarfile" type="file" name="file" style="display: none;">
+                                        </div>
+                                        <div class="form-group">
+                                        	<div class="input-group">
+  											<input id="fileCover" class="form-control" placeholder="Choose your mining jar..." readonly/>
+  											<div class="input-group-btn">
+  												<button type="button" class="btn btn-info" onclick="$('input[id=jarfile]').click();"><i class="fa fa-plus"></i></button>
+  											</div>
+  											</div>
+  											<div id="warning" class="form-group" style="display:none;">
+   												<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.jar FILE ONLY!!!</label>
+   											</div>
+                                        </div>
+  										<script type="text/javascript">
+											$('input[id=jarfile]').change(function() {
+												var str = $(this).val();
+												var arr=str.split('\\');//注split可以用字符或字符串分割 
+												var name=arr[arr.length-1];//这就是要取得的图片名称 
+												checkExtension(name, 'jar', '#warning');
+   												$('#fileCover').val(name);
+											});
+					
+										</script>
+										<div class="form-group">
+                                        	<input id="pagefile" type="file" name="file" style="display: none;">
+                                        </div>
+                                        <div class="form-group">
+                                        	<div class="input-group">
+  											<input id="pfileCover" class="form-control" placeholder="Choose your display page..." readonly/>
+  											<div class="input-group-btn">
+  												<button type="button" class="btn btn-info" onclick="$('input[id=pagefile]').click();"><i class="fa fa-plus"></i></button>
+  											</div>
+  											</div>
+  											<div id="pwarning" class="form-group" style="display:none;">
+   												<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.html FILE ONLY!!!</label>
+   											</div>
+                                        </div>
+  										<script type="text/javascript">
+											$('input[id=pagefile]').change(function() {
+												var str = $(this).val();
+												var arr=str.split('\\');//注split可以用字符或字符串分割 
+												var name=arr[arr.length-1];//这就是要取得的图片名称 
+												checkExtension(name, 'html', '#pwarning');
+   												$('#pfileCover').val(name);
+											});
+										</script>  	
+                                        <div>
+                                            <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                        </div>
+                                        <input id="reset" name="reset" type="reset" style="display:none;" />
+                                    </form>
+                                </div>
+                                <div class="box-footer clearfix">
+                                    <button class="pull-right btn btn-default" onclick="uploadPlugin()">Upload <i class="fa fa-arrow-circle-up"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div id="upload" class="box box-info">
                                 <div class="box-header">
                                     <i class="fa fa-inbox"></i>
                                     <h3 class="box-title">All Plugins</h3>
@@ -318,7 +359,7 @@
                             		</div>
                             	</div>
                            </div>
-                   		</section>
+                        </section>
                    </div>
 
                 </section><!-- /.content -->
@@ -332,41 +373,20 @@
           			<div class="header bg-light-blue">Update the Plugin's Specification</div>
             
                 <div class="body bg-gray">
-                	<form action="#" method="post">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="mpluginname" placeholder="Plugin Name"/>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="mdeveloper" placeholder="Developer"/>
-                                        </div>
-                                        <div class="form-group">
-                                        	<input id="mlefile" type="file" name="file" style="display: none;">
-                                        </div>
-                                        <div class="form-group">
-                                        	<div class="input-group">
-  											<input id="mfileCover" class="form-control" placeholder="Choose your plugin..." readonly/>
-  											<div class="input-group-btn">
-  												<button type="button" class="btn btn-info" onclick="$('input[id=mlefile]').click();"><i class="fa fa-plus"></i></button>
-  											</div>
-  											</div>
-  											<div id="mwarning" class="form-group" style="display:none;">
-   												<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.zip FILE ONLY!!!</label>
-   											</div>
-                                        </div>
-  										<script type="text/javascript">
-											$('input[id=mlefile]').change(function() {
-												var str = $(this).val();
-												var arr=str.split('\\');//注split可以用字符或字符串分割 
-												var name=arr[arr.length-1];//这就是要取得的图片名称 
-												checkExtension(name, 'zip', '#mwarning');
-   												$('#mfileCover').val(name);
-											});
-					
-										</script> 	
-                                        <div>
-                                            <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                                        </div>
-                                    </form>
+                	<form id="updateForm">
+                        <div class="form-group">
+                             <input type="text" class="form-control" name="plugiNname" placeholder="Plugin Name"/>
+                        </div>
+                        <div class="form-group">
+                             <input type="text" class="form-control" name="developer" placeholder="Developer"/>
+                        </div>
+                        <div class="form-group">
+                             <input type="text" class="form-control" name="category" placeholder="Category"/>
+                        </div>	
+                        <div>
+                             <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                        </div>
+                    </form>
                 </div>
                 <div class="footer">                  
                     <button type="button" class="btn bg-light-blue btn-block" onclick="updatePlugin()">Update</button>
@@ -517,6 +537,60 @@
 
 		function update() {
 			$("#updateModal").modal('show');
+		}
+
+
+		function uploadPlugin() {
+			var iframe = $('<iframe name="postiframe" id="postiframe" style="display: none"></iframe>');
+
+            $("body").append(iframe);
+
+            var form = $('#uploadForm');
+            form.attr("action", "PluginMgmServlet?op=0");
+            form.attr("method", "post");
+
+            form.attr("encoding", "multipart/form-data");
+            form.attr("enctype", "multipart/form-data");
+            form.attr("target", "postiframe");
+            var ret = true;
+            ret = (checkExtension($('input[id=jarfile]').val(), 'jar', '#warning') == false) ? checkExtension($('input[id=jarfile]').val(), 'jar', '#warning') : ret;
+            ret = (checkExtension($('input[id=pagefile]').val(), 'html', '#pwarning') == false) ? checkExtension($('input[id=pagefile]').val(), 'html', '#pwarning') : ret;
+            if (!ret) {
+				return;
+	        }
+            form.submit();
+
+            $("#postiframe").load(function () {
+            	var content = iframe.contents().find('body').text()
+            	// Attempt to parse JSON response, else return text response
+            	try {
+            	    content = $.parseJSON(iframe.contents().find('body').text());
+            	}catch (e){
+            	    console.log("WARN: XHR response is not valid JSON: '" + content + "'");
+            	}
+            	var json = content;
+				if (json.status == "OK") {
+					$("#reset").click();
+    			}
+            });
+
+            return false;
+		}
+
+		function randomString(len) {
+			　　len = len || 32;
+			　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+			　　var maxPos = $chars.length;
+			　　var pwd = '';
+			　　for (i = 0; i < len; i++) {
+			　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+			　　}
+			　　return pwd;
+			}
+
+		function getApiKey() {
+			var key = randomString(12);
+			$('#apiKey').val(key);
 		}
         
         </script>       

@@ -1,14 +1,11 @@
 package org.pmf.servlet;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale.Category;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,22 +20,19 @@ import net.sf.json.JSONObject;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.deckfour.xes.in.XesXmlParser;
-import org.deckfour.xes.model.XLog;
 import org.pmf.plugin.entity.Plugin;
-import org.pmf.plugin.service.PluginService;
 
 /**
- * Servlet implementation class PluginTestServlet
+ * Servlet implementation class PluginMgmServlet
  */
-@WebServlet("/PluginTestServlet")
-public class PluginTestServlet extends HttpServlet {
+@WebServlet("/PluginMgmServlet")
+public class PluginMgmServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public PluginTestServlet() {
+    public PluginMgmServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -58,57 +52,39 @@ public class PluginTestServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		this.processRequest(request, response);
 	}
-	
-	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-//		Map<String, Map<String, String>> pluginContext = new HashMap<String, Map<String, String>>();
-//		Map<String, String> snhow = new HashMap<String, String>();
-//		Map<String, String> alphaplus = new HashMap<String, String>();
-//		alphaplus.put("jar", "AlphaPlusMiner_fat.jar");
-//		alphaplus.put("service_class", "org.pmf.tools.alphaminer.AlphaPluginService");
-//		snhow.put("jar", "HoWMiner_fat.jar");
-//		snhow.put("service_class", "org.pmf.tools.snminer.mining.SNHOWPluginService");
-//		pluginContext.put("alphaplus", alphaplus);
-//		pluginContext.put("snhow", snhow);
-		
-		String apiKey = request.getParameter("apiKey");
-		System.out.println("apiKey="+apiKey);
-		
-		String confPath = this.getServletContext().getRealPath("/WEB-INF/conf");
-		Plugin plugin = Plugin.loadPlugin(apiKey, confPath+"/");
-		
-		if (plugin == null) {
-			JSONObject json = new JSONObject();
-			json.element("status", "ERROR");
-			response.setContentType("application/json; charset=utf-8");		
-			PrintWriter out = response.getWriter();
-			out.print(json);
-			return;
-		}
-		
-//		if (!pluginContext.containsKey(apiKey)) {
-//			JSONObject json = new JSONObject();
-//			json.element("status", "ERROR");
-//			response.setContentType("application/json; charset=utf-8");		
-//			PrintWriter out = response.getWriter();
-//			out.print(json);
-//			return;
-//		}
-		
 		//得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
-        String savePath = this.getServletContext().getRealPath("/WEB-INF/upload");
-        File saveDir = new File(savePath);
+        String confPath = this.getServletContext().getRealPath("/WEB-INF/conf");
+        File confDir = new File(confPath);
         //判断上传文件的保存目录是否存在
-        if (!saveDir.exists() && !saveDir.isDirectory()) {
-            System.out.println(savePath+"目录不存在，需要创建");
+        if (!confDir.exists() && !confDir.isDirectory()) {
+            System.out.println(confPath+"目录不存在，需要创建");
             //创建目录
-            saveDir.mkdir();
+            confDir.mkdir();
         }
+        
         //消息提示
         String message = "";
         String filename = "";
+        String filesuffix = "";
         File file = null;
+        
         Map<String,String> params = new HashMap<String,String>();
+        Map<String,String> suffix_path = new HashMap<String,String>();
+        suffix_path.put("jar", this.getServletContext().getRealPath("/WEB-INF/plugin"));
+        suffix_path.put("html", this.getServletContext().getRealPath("/"));
+        for (String key : suffix_path.keySet()) {
+        	String path = suffix_path.get(key);
+            File dir = new File(path);
+            //判断上传文件的保存目录是否存在
+            if (!dir.exists() && !dir.isDirectory()) {
+                System.out.println(path+"目录不存在，需要创建");
+                //创建目录
+                dir.mkdir();
+            }
+        }
         try{
             //使用Apache文件上传组件处理文件上传步骤：
             //1、创建一个DiskFileItemFactory工厂
@@ -139,10 +115,18 @@ public class PluginTestServlet extends HttpServlet {
                     if(filename==null || filename.trim().equals("")){
                         continue;
                     }
+                    filesuffix = filename.substring(filename.lastIndexOf(".") + 1);  
                     //注意：不同的浏览器提交的文件名是不一样的，有些浏览器提交上来的文件名是带有路径的，如：  c:\a\b\1.txt，而有些只是单纯的文件名，如：1.txt
                     //处理获取到的上传文件的文件名的路径部分，只保留文件名部分
-                    if (!filename.endsWith(".xes")) {
-                    	message= "仅支持.xes文件";
+                    boolean typeok = false;
+                    for (String key : suffix_path.keySet()) {
+                    	if (key.equals(filesuffix)) {
+                    		typeok = true;
+                    		break;
+                    	}
+                    }
+                    if (!typeok) {
+                    	message= "仅支持.jar和.html文件";
                         JSONObject json = new JSONObject();
             			json.element("status", "ERROR");
             			response.setContentType("application/json; charset=utf-8");		
@@ -150,14 +134,28 @@ public class PluginTestServlet extends HttpServlet {
             			out.print(json);
             			return;
                     }
-                    filename = UUID.randomUUID().toString().replaceAll("-", "") + ".xes";
-                    file = new File(savePath,filename);
+                    filename = UUID.randomUUID().toString().replaceAll("-", "") + "." + filesuffix;
+                    if (filesuffix.equals("jar")) {
+                    	params.put("jarName", filename);
+                    } else if (filesuffix.equals("html")) {
+                    	params.put("pageName", filename);
+                    }
+                    file = new File(suffix_path.get(filesuffix),filename);
                     item.write(file);
                     //删除处理文件上传时生成的临时文件
                     item.delete();
                     message = "文件上传成功！";
                 }
             }
+            Plugin.Category category = Plugin.Category.values()[Integer.parseInt(params.get("category"))];
+            Plugin plugin = new Plugin(params.get("pluginName"), params.get("apiKey"), params.get("developer"), category, params.get("description"), params.get("serviceClass"), params.get("jarName"), params.get("pageName"));
+            Plugin.storePlugin(plugin, confPath+"/");
+            JSONObject json = new JSONObject();
+			json.element("status", "OK");
+			response.setContentType("application/json; charset=utf-8");		
+			PrintWriter out = response.getWriter();
+			out.print(json);
+			return;
         }catch (Exception e) {
             message= "文件上传失败！";
             e.printStackTrace();
@@ -167,55 +165,7 @@ public class PluginTestServlet extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(json);
 			return;
-            
         }
-        
-		XesXmlParser parser =  new XesXmlParser();
-		InputStream inputfile;
-		try {
-			if (file == null) {
-				JSONObject json = new JSONObject();
-				json.element("status", "ERROR");
-				response.setContentType("application/json; charset=utf-8");		
-				PrintWriter out = response.getWriter();
-				out.print(json);
-				return;
-			}
-			inputfile = new FileInputStream(file);
-			List<XLog> logs = parser.parse(inputfile);
-			if (logs != null && !logs.isEmpty()) {
-				XLog log = logs.get(0);
-				String pluginPath = this.getServletContext().getRealPath("/WEB-INF/plugin");
-				ClassLoader cl = new URLClassLoader(new URL[] {new URL("file:///"+pluginPath+"/"+plugin.getJarName())}, this.getClass().getClassLoader());
-				Class<?> c = Class.forName(plugin.getServiceClass(), true, cl);
-				Class<? extends PluginService> pluginClass = c.asSubclass(PluginService.class);
-//				Object o = c.newInstance();
-//				if (o instanceof PluginService) {
-//					System.out.println("yes");
-//				} else {
-//					System.out.println("no");
-//				}
-				PluginService service = pluginClass.newInstance();
-				JSONObject json = service.doPluginService(log, params);
-				response.setContentType("application/json; charset=utf-8");
-				PrintWriter out = response.getWriter();
-				out.print(json);
-			} else {
-				JSONObject json = new JSONObject();
-				json.element("status", "ERROR");
-				response.setContentType("application/json; charset=utf-8");		
-				PrintWriter out = response.getWriter();
-				out.print(json);
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			JSONObject json = new JSONObject();
-			json.element("status", "ERROR");
-			response.setContentType("application/json; charset=utf-8");		
-			PrintWriter out = response.getWriter();
-			out.print(json);
-		}
 	}
 
 }
