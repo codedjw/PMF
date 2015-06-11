@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -28,7 +30,9 @@ import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.pmf.graph.socialnetwork.SocialNetwork;
+import org.pmf.plugin.service.PluginService;
 import org.pmf.tools.snminer.mining.SNHOWMiner;
+import org.pmf.tools.snminer.mining.SNHOWPluginService;
 import org.pmf.tools.snminer.mining.SNMiningOptions;
 import org.pmf.tools.snminer.mining.handover.HandOverCCIDCM;
 import org.pmf.tools.snminer.mining.operation.BasicOperation;
@@ -95,9 +99,10 @@ public class SNMTestServlet extends HttpServlet {
         String message = "";
         String filename = "";
         File file = null;
-        int depth = 1;
-        double beta = 0.5;
-        boolean cc = false, cm = false;
+//        int depth = 1;
+//        double beta = 0.5;
+//        boolean cc = false, cm = false;
+        Map<String,String> params = new HashMap<String,String>();
         try{
             //使用Apache文件上传组件处理文件上传步骤：
             //1、创建一个DiskFileItemFactory工厂
@@ -120,15 +125,16 @@ public class SNMTestServlet extends HttpServlet {
                     //解决普通输入项的数据的中文乱码问题
                     String value = item.getString("UTF-8");
                     //value = new String(value.getBytes("iso8859-1"),"UTF-8");
-                    if (name.equals("depth")) {
-                    	depth = Integer.parseInt(value);
-                    } else if (name.equals("beta")) {
-                    	beta = Double.parseDouble(value);
-                    } else if (name.equals("cm") && value.equals("on")) {
-                    	cm = true;
-                    } else if (name.equals("cc") && value.equals("on")) {
-                    	cc = true;
-                    }
+//                    if (name.equals("depth")) {
+//                    	depth = Integer.parseInt(value);
+//                    } else if (name.equals("beta")) {
+//                    	beta = Double.parseDouble(value);
+//                    } else if (name.equals("cm") && value.equals("on")) {
+//                    	cm = true;
+//                    } else if (name.equals("cc") && value.equals("on")) {
+//                    	cc = true;
+//                    }
+                    params.put(name, value);
                     System.out.println(name + "=" + value);
                 }else{//如果fileitem中封装的是上传文件
                     //得到上传的文件名称，
@@ -183,48 +189,11 @@ public class SNMTestServlet extends HttpServlet {
 			List<XLog> logs = parser.parse(inputfile);
 			if (logs != null && !logs.isEmpty()) {
 				XLog log = logs.get(0);
-				int type = -1;
-				type = SNMiningOptions.HANDOVER_OF_WORK;
-				if (cm) {
-					type+=SNMiningOptions.CONSIDER_MULTIPLE_TRANSFERS;
-				}
-				if (cc) {
-					type+=SNMiningOptions.CONSIDER_CAUSALITY;
-				}
-//				type = SNMiningOptions.HANDOVER_OF_WORK + SNMiningOptions.CONSIDER_CAUSALITY + SNMiningOptions.CONSIDER_MULTIPLE_TRANSFERS;
-//				type = SNMiningOptions.HANDOVER_OF_WORK + SNMiningOptions.CONSIDER_CAUSALITY;
-//				type = SNMiningOptions.HANDOVER_OF_WORK + SNMiningOptions.CONSIDER_MULTIPLE_TRANSFERS;
-//				type = SNMiningOptions.HANDOVER_OF_WORK;
-				SNHOWMiner snm = new SNHOWMiner();
-				SocialNetwork sn = snm.doSNHOWMining(log, type, beta, depth);
-				if (sn != null) {
-					JSONObject json = new JSONObject();
-					json.element("status", "OK");
-					json.element("result", sn.buildJson());
-					// get EventClasses Info
-					XLogInfo logInfo = XLogInfoFactory.createLogInfo(log);
-					XEventClasses classes = logInfo.getEventClasses();
-					List<XEventClass> eventClasses = new ArrayList<XEventClass>(classes.size());
-					eventClasses.addAll(classes.getClasses());
-					JSONArray logarray = new JSONArray();
-					for (XEventClass ec : eventClasses) {
-						JSONObject logitem = new JSONObject();
-						logitem.element("EventClass", ec.toString());
-						logitem.element("Frequency", ec.size());
-						logarray.element(logitem);
-					}
-					json.element("log", logarray);
-					System.out.println("Retrun JSON:"+json);
-					response.setContentType("application/json; charset=utf-8");		
-					PrintWriter out = response.getWriter();
-					out.print(json);
-				} else {
-					JSONObject json = new JSONObject();
-					json.element("status", "ERROR");
-					response.setContentType("application/json; charset=utf-8");		
-					PrintWriter out = response.getWriter();
-					out.print(json);
-				}
+				PluginService service = new SNHOWPluginService();
+				JSONObject json = service.doPluginService(log, params);
+				response.setContentType("application/json; charset=utf-8");
+				PrintWriter out = response.getWriter();
+				out.print(json);
 			} else {
 				JSONObject json = new JSONObject();
 				json.element("status", "ERROR");

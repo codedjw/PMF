@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin Page</title>
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+        <!-- bootstrap 3.0.2 -->
+        <link href="ALTE-template/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <!-- font Awesome -->
+        <link href="ALTE-template/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <!-- Ionicons -->
+        <link href="ALTE-template/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+        <!-- Theme style -->
+        <link href="ALTE-template/css/AdminLTE.css" rel="stylesheet" type="text/css" />
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+        
+        <!-- <link rel="stylesheet" type="text/css" href="new/css/common.css" />
+        <link rel="stylesheet" type="text/css" href="new/css/PNShow.css" /> -->
+        
+        <!-- jQuery 2.0.2 -->
+        <script src="jquery-2.1.0.js"></script>
+        <script src="new/js/util.js"></script>
+        <script src="highcharts/highcharts.js"></script>
+        <script src="highcharts/modules/exporting.js"></script>
+    </head>
+    <body class="skin-blue">
+    	<script type="text/javascript">
+        $(document).ready(function() {
+        	/* var json = {logid : 0}; */
+        	/* subshow(); */
+        	/* getAlphaResults(json); */
+        });
+
+        </script>
+        <!-- header logo: style can be found in header.less -->
+        <header class="header">
+            <a href="admin.html" class="logo">
+                <!-- Add the class icon to your logo image or logo icon to add the margining -->
+                Process Miner
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="javascript:void(0)" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <div class="navbar-right">
+                    <ul class="nav navbar-nav">
+                        <!-- User Account: style can be found in dropdown.less -->
+                        <li class="dropdown user user-menu">
+                            <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="glyphicon glyphicon-user"></i>
+                                <span>Jane Doe <i class="caret"></i></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header bg-light-blue">
+                                    <img src="ALTE-template/img/avatar3.png" class="img-circle" alt="User Image" />
+                                    <p>
+                                        Jane Doe - IBM
+                                        <small>Data Analyst</small>
+                                    </p>
+                                </li>
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="javascript:void(0)" class="btn btn-default btn-flat">Profile</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="javascript:void(0)" class="btn btn-default btn-flat">Sign out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div class="wrapper row-offcanvas row-offcanvas-left">
+            <!-- Left side column. contains the logo and sidebar -->
+            <aside class="left-side sidebar-offcanvas">                
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+                    <!-- Sidebar user panel -->
+                    <div class="user-panel">
+                        <div class="pull-left image">
+                            <img src="ALTE-template/img/avatar3.png" class="img-circle" alt="User Image" />
+                        </div>
+                        <div class="pull-left info">
+                            <p>Hello, Jane</p>
+
+                            <a href="javascript:void(0)"><i class="fa fa-circle text-success"></i> Online</a>
+                        </div>
+                    </div>
+                    <!-- search form -->
+                    <!-- <form action="#" method="get" class="sidebar-form">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search..."/>
+                            <span class="input-group-btn">
+                                <button type='submit' name='seach' id='search-btn' class="btn btn-flat"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </form>  -->
+                    <!-- /.search form -->
+                    <!-- sidebar menu: : style can be found in sidebar.less -->
+                    <ul class="sidebar-menu">
+                        <li class="active">
+                            <a href="admin.html">
+                                <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+
+            <!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side">                
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                	<h1>
+                		Mining Algorithm Management
+                		<small>upload, remove, update, inspect</small>
+                	</h1>
+                    <ol class="breadcrumb">
+                        <li><a href="javascript:void(0)"><i class="fa fa-dashboard"></i> Home</a></li>
+                        <li class="active">Mining Algorithm Management</li>
+                    </ol>
+                </section>
+
+                <!-- Main content -->
+                <section class="content">
+                 <!-- Small boxes (Stat box) -->
+                <div class="row">
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box bg-aqua">
+                                <div class="inner">
+                                    <h3>
+                                        Upload
+                                    </h3>
+                                    <p>
+                                        New Plugin
+                                    </p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-ios7-cart-outline"></i>
+                                </div>
+                                <a href="#upload" class="small-box-footer">
+                                    More info <i class="fa fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div><!-- ./col -->
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box bg-green">
+                                <div class="inner">
+                                    <h3>
+                                        Remove
+                                    </h3>
+                                    <p>
+                                        Existing Plugin
+                                    </p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-ios7-pricetag-outline"></i>
+                                </div>
+                                <a href="#list" class="small-box-footer">
+                                    More info <i class="fa fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div><!-- ./col -->
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box bg-yellow">
+                                <div class="inner">
+                                    <h3>
+                                        Update
+                                    </h3>
+                                    <p>
+                                        Plugin's Description
+                                    </p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-person-add"></i>
+                                </div>
+                                <a href="#list" class="small-box-footer">
+                                    More info <i class="fa fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div><!-- ./col -->
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box bg-red">
+                                <div class="inner">
+                                    <h3>
+                                        Inspect
+                                    </h3>
+                                    <p>
+                                        Plugin's Status
+                                    </p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-stats-bars"></i>
+                                </div>
+                                <a href="#inspect" class="small-box-footer">
+                                    More info <i class="fa fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div><!-- ./col -->
+                    </div><!-- /.row -->
+                    <!-- quick email widget -->
+                   <div class="row">
+                   		  <section class="col-lg-6 connectedSortable">
+                   		  <div id="upload" class="box box-info">
+                                <div class="box-header">
+                                    <i class="fa fa-envelope"></i>
+                                    <h3 class="box-title">Upload new plugin</h3>
+                                    <!-- tools box -->
+                                    <div class="pull-right box-tools">
+                                        <button class="btn btn-info btn-sm pull-right" data-widget='collapse' data-toggle="tooltip" title="Collapse" style="margin-right: 5px;"><i class="fa fa-minus"></i></button>
+                                    </div><!-- /. tools -->
+                                </div>
+                                <div class="box-body">
+                                    <form action="#" method="post">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="pluginname" placeholder="Plugin Name"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="developer" placeholder="Developer"/>
+                                        </div>
+                                        <div class="form-group">
+                                        	<input id="lefile" type="file" name="file" style="display: none;">
+                                        </div>
+                                        <div class="form-group">
+                                        	<div class="input-group">
+  											<input id="fileCover" class="form-control" placeholder="Choose your plugin..." readonly/>
+  											<div class="input-group-btn">
+  												<button type="button" class="btn btn-info" onclick="$('input[id=lefile]').click();"><i class="fa fa-plus"></i></button>
+  											</div>
+  											</div>
+  											<div id="warning" class="form-group" style="display:none;">
+   												<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.zip FILE ONLY!!!</label>
+   											</div>
+                                        </div>
+  										<script type="text/javascript">
+											$('input[id=lefile]').change(function() {
+												var str = $(this).val();
+												var arr=str.split('\\');//注split可以用字符或字符串分割 
+												var name=arr[arr.length-1];//这就是要取得的图片名称 
+												checkExtension(name, 'zip', '#warning');
+   												$('#fileCover').val(name);
+											});
+					
+										</script> 	
+                                        <div>
+                                            <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="box-footer clearfix">
+                                    <button class="pull-right btn btn-default" id="sendEmail">Upload <i class="fa fa-arrow-circle-up"></i></button>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="col-lg-6 connectedSortable">
+                        	<!-- Custom tabs (Charts with tabs)-->
+                            <div class="nav-tabs-custom" id="inspect">
+                                <!-- Tabs within a box -->
+                                <ul class="nav nav-tabs pull-right">
+                                    <li><a href="#invoke-chart" data-toggle="tab">Invoke</a></li>
+                                    <li class="active"><a href="#owned-chart" data-toggle="tab">Owned by USER</a></li>
+                                    <li class="pull-left header"><i class="fa fa-bar-chart-o"></i> Inspect</li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <!-- Morris chart - Sales -->
+                                    <div class="chart tab-pane" id="invoke-chart" style="position: relative; height: 400px;"></div>
+                                    <div class="chart tab-pane active" id="owned-chart" style="position: relative; height: 400px;"></div>
+                                </div>
+                            </div><!-- /.nav-tabs-custom -->
+                        </section>    
+                   </div>
+                   <div class="row">
+                   		<section class="col-lg-12">
+                   			<div id="upload" class="box box-info">
+                                <div class="box-header">
+                                    <i class="fa fa-inbox"></i>
+                                    <h3 class="box-title">All Plugins</h3>
+                                    <!-- tools box -->
+                                    <div class="pull-right box-tools">
+                                        <button class="btn btn-info btn-sm pull-right" data-widget='collapse' data-toggle="tooltip" title="Collapse" style="margin-right: 5px;"><i class="fa fa-minus"></i></button>
+                                    </div><!-- /. tools -->
+                                </div>
+                                <div class="box-body">
+                                    <div id="list" class="table-responsive">
+                           				<table class='table table-striped'>
+                           					<tr><th>ID</th><th>Plugin Name</th><th>Category</th><th>Action</th></tr>
+                           					<tr><td>1</td><td>Alpha Plus Algorithm</td><td>Control-flow Discovery</td>
+                           						<td><button class="btn btn-info" onclick="update()"><i class="fa fa-pencil"></i> Update</button>
+                                    				<button class="btn btn-warning"><i class="fa fa-warning"></i> Remove</button>
+                                    			</td>
+             								</tr>
+                           					<tr><td>2</td><td>Handover of Work Metrics</td><td>Social-network Discovery</td>
+												<td><button class="btn btn-info" onclick="update()"><i class="fa fa-pencil"></i> Update</button>
+                                    				<button class="btn btn-warning"><i class="fa fa-warning"></i> Remove</button>
+                                    			</td>
+                           					</tr>
+                           				</table>         
+                            		</div>
+                            	</div>
+                           </div>
+                   		</section>
+                   </div>
+
+                </section><!-- /.content -->
+            </aside><!-- /.right-side -->
+        </div><!-- ./wrapper -->
+        
+        <!-- Modal -->
+  		<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    		<div class="modal-dialog">
+      			<div class="modal-content form-box">
+          			<div class="header bg-light-blue">Update the Plugin's Specification</div>
+            
+                <div class="body bg-gray">
+                	<form action="#" method="post">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="mpluginname" placeholder="Plugin Name"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="mdeveloper" placeholder="Developer"/>
+                                        </div>
+                                        <div class="form-group">
+                                        	<input id="mlefile" type="file" name="file" style="display: none;">
+                                        </div>
+                                        <div class="form-group">
+                                        	<div class="input-group">
+  											<input id="mfileCover" class="form-control" placeholder="Choose your plugin..." readonly/>
+  											<div class="input-group-btn">
+  												<button type="button" class="btn btn-info" onclick="$('input[id=mlefile]').click();"><i class="fa fa-plus"></i></button>
+  											</div>
+  											</div>
+  											<div id="mwarning" class="form-group" style="display:none;">
+   												<label class="text-danger"><i class="fa fa-warning"></i>&nbsp;.zip FILE ONLY!!!</label>
+   											</div>
+                                        </div>
+  										<script type="text/javascript">
+											$('input[id=mlefile]').change(function() {
+												var str = $(this).val();
+												var arr=str.split('\\');//注split可以用字符或字符串分割 
+												var name=arr[arr.length-1];//这就是要取得的图片名称 
+												checkExtension(name, 'zip', '#mwarning');
+   												$('#mfileCover').val(name);
+											});
+					
+										</script> 	
+                                        <div>
+                                            <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                        </div>
+                                    </form>
+                </div>
+                <div class="footer">                  
+                    <button type="button" class="btn bg-light-blue btn-block" onclick="updatePlugin()">Update</button>
+                    <button type="button" class="btn bg-gray btn-block" data-dismiss="modal">Close</button>
+                </div>
+      		</div><!-- /.modal-content -->
+    	</div><!-- /.modal-dialog -->
+  		</div><!-- /.modal -->
+
+
+        <script src="ALTE-template/js/jquery-ui-1.10.3.min.js" type="text/javascript"></script>
+        <!-- Bootstrap -->
+        <script src="ALTE-template/js/bootstrap.min.js" type="text/javascript"></script>
+        <!-- Morris.js charts -->
+        <script src="raphael.js"></script>
+        <script src="ALTE-template/js/plugins/morris/morris.min.js" type="text/javascript"></script>
+        <!-- Sparkline -->
+        <script src="ALTE-template/js/plugins/sparkline/jquery.sparkline.min.js" type="text/javascript"></script>
+        <!-- jvectormap -->
+        <script src="ALTE-template/js/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js" type="text/javascript"></script>
+        <script src="ALTE-template/js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js" type="text/javascript"></script>
+        <!-- fullCalendar -->
+        <script src="ALTE-template/js/plugins/fullcalendar/fullcalendar.min.js" type="text/javascript"></script>
+        <!-- jQuery Knob Chart -->
+        <script src="ALTE-template/js/plugins/jqueryKnob/jquery.knob.js" type="text/javascript"></script>
+        <!-- daterangepicker -->
+        <script src="ALTE-template/js/plugins/daterangepicker/daterangepicker.js" type="text/javascript"></script>
+        <!-- Bootstrap WYSIHTML5 -->
+        <script src="ALTE-template/js/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js" type="text/javascript"></script>
+        <!-- iCheck -->
+        <script src="ALTE-template/js/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+
+        <!-- AdminLTE App -->
+        <script src="ALTE-template/js/AdminLTE/app.js" type="text/javascript"></script>
+        
+        <script type="text/javascript">
+        $(".connectedSortable").sortable({
+            placeholder: "sort-highlight",
+            connectWith: ".connectedSortable",
+            handle: ".box-header, .nav-tabs",
+            forcePlaceholderSize: true,
+            zIndex: 999999
+        }).disableSelection();
+        $(".box-header, .nav-tabs").css("cursor","move");
+        
+        $('#invoke-chart').highcharts({
+            chart: {
+                type: 'areaspline'
+            },
+            title: {
+                text: 'Average fruit consumption during one week'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 150,
+                y: 100,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: '#FFFFFF'
+            },
+            xAxis: {
+                categories: [
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                    'Saturday',
+                    'Sunday'
+                ]
+            },
+            yAxis: {
+                title: {
+                    text: 'Fruit units'
+                }
+            },
+            tooltip: {
+                shared: true,
+                valueSuffix: ' units'
+            },
+            credits: {
+                enabled: false
+            },
+            plotOptions: {
+                areaspline: {
+                    fillOpacity: 0.5
+                }
+            },
+            series: [{
+                name: 'John',
+                data: [3, 4, 3, 5, 4, 10, 12]
+            }, {
+                name: 'Jane',
+                data: [1, 3, 4, 3, 3, 5, 4]
+            }]
+        });
+        
+        $('#owned-chart').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: 'Plugins Owned by Users'
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+        	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Owned by Users',
+                data: [
+                    ['Alpha Plus',   45],
+                    {
+                        name: 'Handover of Matrices',
+                        y: 23,
+                        sliced: true,
+                        selected: true
+                    }
+                ]
+            }]
+        });
+     	// fix dimensions of chart that was in a hidden element
+		jQuery(document).on( 'shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
+			var chart0 = $('#invoke-chart').highcharts();
+	        chart0.reflow();
+	        var char1 = $('#owned-chart').highcharts();
+	        chart1.reflow();
+		});
+
+		function update() {
+			$("#updateModal").modal('show');
+		}
+        
+        </script>       
+    </body>
+</html>

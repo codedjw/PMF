@@ -1,0 +1,26 @@
+#logselectedarea {
+	width: 60%;
+	height: 50px;
+}
+#miningarea {
+	width: 100%;
+	height: 500px;
+}
+#graph {
+	width: 60%;
+	height: 100%;
+	float: left;
+	border: thin solid #ccc;
+}
+#logarea {
+	width: 37%;
+	height: 100%;
+	margin-left: 62%;
+}
+#showarea {
+	width: 100%;
+}
+#logtext {
+	width: 100%;
+	margin-top:5%;
+}

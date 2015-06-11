@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Online Process Mining</title>
+<link rel="stylesheet" type="text/css" href="css/common.css" />
+<link rel="stylesheet" type="text/css" href="css/PNShow.css" />
+<link rel="stylesheet" type="text/css" href="css/summaryShow.css" />
+<link rel="stylesheet" type="text/css" href="css/SNShow.css" />
+<script type="text/javascript" src="jquery-2.1.0.js"></script>
+<script type="text/javascript" src="d3.js"></script>
+<script type="text/javascript" src="highcharts/highcharts.js"></script>
+<script type="text/javascript" src="highcharts/highcharts-3d.js"></script>
+<script type="text/javascript" src="highcharts/modules/exporting.js"></script>
+<script type="text/javascript" src="js/alphaGet.js"></script>
+<script type="text/javascript" src="js/summaryShow.js"></script>
+<script type="text/javascript" src="js/alphaShow.js"></script>
+<script type="text/javascript" src="js/SNHoWGet.js"></script>
+<script type="text/javascript" src="js/SNHoWShow.js"></script>
+<script type="text/javascript" src="js/commonShow.js"></script>
+<script>
+$(document).ready(function() {
+	var json = {logid : 0};
+	subshow();
+	getAlphaResults(json);
+});
+
+function subshow() {
+	// clear before
+	var selOpt = $("#logchoice option");  
+    selOpt.remove();
+    //////
+    var selObj = $("#logchoice");
+    console.log("AL:"+$("#miningalgorithm").val());
+	if ($("#miningalgorithm").val() == 0) {
+		selObj.append("<option value='"+0+"' selected>"+"FILE I(Choices & Parallels)"+"</option>");
+		selObj.append("<option value='"+1+"'>"+"FILE II(Long-Loop)"+"</option>");
+		selObj.append("<option value='"+2+"'>"+"FILE III(Long-Loop)"+"</option>");
+		selObj.append("<option value='"+3+"'>"+"FILE IV(Two Choices Without Local Dependencies)"+"</option>");
+		selObj.append("<option value='"+4+"'>"+"FILE V(Parallels and Long-Loop)"+"</option>");
+		selObj.append("<option value='"+5+"'>"+"FILE VI(Alpha+ Cons:Redundancy)"+"</option>");
+		selObj.append("<option value='"+6+"'>"+"FILE VII(One-Loop)"+"</option>");
+		selObj.append("<option value='"+7+"'>"+"FILE VIII(Two-Loop)"+"</option>");
+		selObj.append("<option value='"+8+"'>"+"FILE(One-LoopX2)"+"</option>");
+		selObj.append("<option value='"+9+"'>"+"BIGGER DEMO"+"</option>");
+		selObj.append("<option value='"+10+"'>"+"Repair Example"+"</option>");
+		selObj.append("<option value='"+11+"'>"+"Reviewing"+"</option>");
+		selObj.append("<option value='"+12+"'>"+"Teleclaims"+"</option>");
+	} else {
+		selObj.append("<option value='"+0+"' selected>"+"Repair Example"+"</option>");
+		selObj.append("<option value='"+1+"'>"+"Reviewing Example"+"</option>");
+		selObj.append("<option value='"+2+"'>"+"Teleclaims Example"+"</option>");
+	}
+}
+
+function calculate() {
+	if ($("#miningalgorithm").val() == 0) {
+		doAlpha();
+	} else {
+		doSNHoW();
+	}
+}
+
+</script>
+</head>
+<body>
+<div id="logselectedarea">
+<h3>Choose a log file:</h3>
+<select id="miningalgorithm" onchange="subshow()">
+	<option value="0" selected>Alpha Mining Algorithm</option>
+	<option value="1">SNM Algorithm(Handover of Work)</option>
+</select>
+<select id="logchoice">
+</select>
+<select id="dragchoice" style="float: right;">
+	<option value="0" selected>Active</option>
+	<option value="1">Fixed</option>
+</select>
+<input type="button" name="Submit" value="Choose" onClick="calculate()" />
+</div>
+<div id="miningarea">
+<div id="graph"></div>
+<script>
+var status = "";
+var width = $("#graph").width(), height = $("#graph").height();
+
+var data = {
+		"nodes":[{"label":"Start", "detail":"Start", "type":"PN_PLACE"}, 
+		 		{"label":"A", "detail":"A", "type":"PN_TRANSITION"},
+		 		{"label":"End", "detail":"End", "type":"PN_PLACE"}],
+		"links":[{"source":0, "target":1, "type":1},
+		         {"source":1, "target":2, "type":1}]
+};
+
+var force = d3.layout.force()
+	.size([width,height])
+	.on("tick", tick);
+
+var zoom = d3.behavior.zoom()
+						.scaleExtent([0.4, 5])
+						.on("zoom", onZoomChanged);
+	
+var svg = d3.select("#graph").append("svg")
+	.attr("pointer-events", "all")
+	.call(zoom)
+	.attr("width", width)
+    .attr("height", height)
+    .style("cursor", "move");
+    
+var svgg = svg.append("svg:g")
+		.attr("width", width)
+    	.attr("height", height);
+
+var link = svgg.append('svg:g').selectAll(".link"), node = svgg.append('svg:g').selectAll(".node");
+</script>
+<div id="logarea">
+<h3>SUMMARY of the Selected Log:</h3>
+<div id="showarea">
+	<input type="button" name="Change" value="Display in 3D Chart" onClick="showResultIn3DC()"></input>
+	<input type="button" name="Change" value="Display in Line Chart" onClick="showResultInLC()"></input>
+	<input type="button" name="Change" value="Display in Table" onClick="showResultInTbl()"></input>
+</div>
+<div id="logtext"></div>
+</div>
+</div>
+</body>
+</html>

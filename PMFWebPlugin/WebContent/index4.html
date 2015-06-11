@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Online Process Mining</title>
+<link rel="stylesheet" type="text/css" href="css/common.css" />
+<link rel="stylesheet" type="text/css" href="css/SNShow.css" />
+<link rel="stylesheet" type="text/css" href="css/summaryShow.css" />
+<script type="text/javascript" src="jquery-2.1.0.js"></script>
+<script type="text/javascript" src="d3.js"></script>
+<script type="text/javascript" src="highcharts/highcharts.js"></script>
+<script type="text/javascript" src="highcharts/highcharts-3d.js"></script>
+<script type="text/javascript" src="highcharts/modules/exporting.js"></script>
+<script type="text/javascript" src="js/SNHoWGet.js"></script>
+<script type="text/javascript" src="js/summaryShow.js"></script>
+<script type="text/javascript" src="js/SNHoWShow.js"></script>
+<script>
+$(document).ready(function() {
+	var json = {logid : 0};
+	getSNHoWResults(json);
+});
+</script>
+</head>
+<body>
+<div id="logselectedarea">
+<h3>Choose a log file:</h3>
+<select id="miningalgorithm">
+	<option value="0" selected>SNM Algorithm (Handover of Work)</option>
+</select>
+<select id="logchoice">
+	<option value="0" selected>Repair Example</option>
+	<option value="1">Reviewing Example</option>
+	<option value="2">Teleclaims Example</option>
+</select>
+<select id="dragchoice" style="float: right;">
+	<option value="0" selected>Active</option>
+	<option value="1">Fixed</option>
+</select>
+<input type="button" name="Submit" value="Choose" onClick="doSNHoW()" />
+</div>
+<div id="miningarea">
+<div id="graph"></div>
+<script>
+var width = $("#graph").width(), height = $("#graph").height();
+
+var data = {
+		"nodes":[{"label":"Start", "detail":"Start", "type":"PN_PLACE"}, 
+		 		{"label":"A", "detail":"A", "type":"PN_TRANSITION"},
+		 		{"label":"End", "detail":"End", "type":"PN_PLACE"}],
+		"links":[{"source":0, "target":1, "type":1},
+		         {"source":1, "target":2, "type":1}]
+};
+
+var force = d3.layout.force()
+	.gravity(1)
+	.linkDistance(150)
+	.charge(-3000)
+	.size([width,height])
+	.on("tick", tick);
+
+var zoom = d3.behavior.zoom()
+						.scaleExtent([0.4, 5])
+						.on("zoom", onZoomChanged);
+	
+var svg = d3.select("#graph").append("svg")
+	.attr("pointer-events", "all")
+	.call(zoom)
+	.attr("width", width)
+    .attr("height", height)
+    .style("cursor", "move");
+    
+var svgg = svg.append("svg:g")
+		.attr("width", width)
+    	.attr("height", height);
+
+var link = svgg.append('svg:g').selectAll(".link"), node = svgg.append('svg:g').selectAll(".node");
+</script>
+<div id="logarea">
+<h3>SUMMARY of the Selected Log:</h3>
+<div id="showarea">
+	<input type="button" name="Change" value="Display in 3D Chart" onClick="showResultIn3DC()"></input>
+	<input type="button" name="Change" value="Display in Line Chart" onClick="showResultInLC()"></input>
+	<input type="button" name="Change" value="Display in Table" onClick="showResultInTbl()"></input>
+</div>
+<div id="logtext"></div>
+</div>
+</div>
+</body>
+</html>
