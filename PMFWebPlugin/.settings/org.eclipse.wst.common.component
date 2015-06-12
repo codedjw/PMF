@@ -2,6 +2,7 @@
     <wb-module deploy-name="PMFWebPlugin">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/config"/>
         <property name="java-output-path" value="/PMFWebPlugin/build/classes"/>
         <property name="context-root" value="PMFWebPlugin"/>
     </wb-module>

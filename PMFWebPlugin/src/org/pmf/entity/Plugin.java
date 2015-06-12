@@ -1,39 +1,83 @@
-package org.pmf.plugin.entity;
+package org.pmf.entity;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.JoinColumn;
+
+@Entity
+@Table(name="plugin_table")
 public class Plugin {
 	
 	public enum Category {
 		CFD, SND
 	}
 	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int pid;
+	
+	@Column(nullable=false)
 	private String pluginName;
 	
+	@Column(nullable=false)
 	private String apiKey;
 	
+	@Column(nullable=false)
 	private String developer;
 	
+	@Enumerated(EnumType.ORDINAL)
+	@Column(nullable=false)
 	private Category category;
 	
+	@Column(nullable=false)
 	private String description;
 	
+	@Column(nullable=false)
 	private String serviceClass;
 	
+	@Column(nullable=false)
 	private String jarName;
 	
+	@Column(nullable=false)
 	private String pageName;
+	
+	@Column(nullable=false)
+	private int isAvailable;
+	
+	@OneToMany(mappedBy="plugin",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<Invoke> invokes = new HashSet<Invoke>();
+	
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "plugin_user", 
+            joinColumns = { @JoinColumn(name = "plugin_id", referencedColumnName = "pid") }, 
+            inverseJoinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "uid") })
+	private Set<User> users = new HashSet<User>();
 	
 	public Plugin() {
 		
 	}
 
 	public Plugin(String pluginName, String apiKey, String developer,
-			Category category, String description, String serviceClass, String jarName, String pageName) {
+			Category category, String description, String serviceClass, String jarName, String pageName, int isAvailable) {
 		super();
 		this.pluginName = pluginName;
 		this.apiKey = apiKey;
@@ -43,6 +87,15 @@ public class Plugin {
 		this.serviceClass = serviceClass;
 		this.jarName = jarName;
 		this.pageName = pageName;
+		this.isAvailable = isAvailable;
+	}
+	
+	public int getPid() {
+		return pid;
+	}
+
+	public void setPid(int pid) {
+		this.pid = pid;
 	}
 
 	public String getPluginName() {
@@ -109,13 +162,52 @@ public class Plugin {
 		this.pageName = pageName;
 	}
 
+	public int getIsAvailable() {
+		return isAvailable;
+	}
+
+	public void setIsAvailable(int isAvailable) {
+		this.isAvailable = isAvailable;
+	}
+
+	public Set<Invoke> getInvokes() {
+		return invokes;
+	}
+
+	public void setInvokes(Set<Invoke> invokes) {
+		this.invokes = invokes;
+	}
+
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+	
+	 public void addInvoke(Invoke invoke) {
+	       if (!this.invokes.contains(invoke)) {
+	            this.invokes.add(invoke);
+	            invoke.setPlugin(this);
+	       }
+	    }
+
+	    public void removeInoke(Invoke invoke) {
+	        if (this.invokes.contains(invoke)) {
+	            invoke.setPlugin(null);
+	            this.invokes.remove(invoke);
+	        }
+	    }
+
 	@Override
 	public String toString() {
-		return "Plugin [pluginName=" + pluginName + ", apiKey=" + apiKey
-				+ ", developer=" + developer + ", category=" + category
-				+ ", description=" + description + ", serviceClass="
-				+ serviceClass + ", jarName=" + jarName + ", pageName="
-				+ pageName + "]";
+		return "Plugin [pid=" + pid + ", pluginName=" + pluginName
+				+ ", apiKey=" + apiKey + ", developer=" + developer
+				+ ", category=" + category + ", description=" + description
+				+ ", serviceClass=" + serviceClass + ", jarName=" + jarName
+				+ ", pageName=" + pageName + ", isAvailable=" + isAvailable
+				+ ", invokes=" + invokes + ", users=" + users + "]";
 	}
 
 	public static void storePlugin(Plugin plugin, String path) {
@@ -169,7 +261,7 @@ public class Plugin {
 			if (!apiKey.equals(apiKey2)) {
 				return null;
 			}
-			Plugin plugin = new Plugin(pluginName, apiKey, developer, Category.valueOf(category), description, serviceClass, jarName, pageName);
+			Plugin plugin = new Plugin(pluginName, apiKey, developer, Category.valueOf(category), description, serviceClass, jarName, pageName, 1);
 			return plugin;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

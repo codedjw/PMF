@@ -9,6 +9,7 @@ import java.util.Locale.Category;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,7 +21,8 @@ import net.sf.json.JSONObject;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.pmf.plugin.entity.Plugin;
+import org.pmf.eao.PluginEao;
+import org.pmf.entity.Plugin;
 
 /**
  * Servlet implementation class PluginMgmServlet
@@ -28,6 +30,9 @@ import org.pmf.plugin.entity.Plugin;
 @WebServlet("/PluginMgmServlet")
 public class PluginMgmServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	@EJB
+	private PluginEao pluginEao;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -55,6 +60,19 @@ public class PluginMgmServlet extends HttpServlet {
 
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		String opstr = request.getParameter("op");
+		System.out.println("op="+opstr);
+		int op = Integer.parseInt(opstr);
+		switch (op) {
+			case 0:
+				this.uploadPlugin(request, response);
+				break;
+			default:
+				break;
+		}
+	}
+	
+	private void uploadPlugin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
         String confPath = this.getServletContext().getRealPath("/WEB-INF/conf");
         File confDir = new File(confPath);
@@ -148,14 +166,24 @@ public class PluginMgmServlet extends HttpServlet {
                 }
             }
             Plugin.Category category = Plugin.Category.values()[Integer.parseInt(params.get("category"))];
-            Plugin plugin = new Plugin(params.get("pluginName"), params.get("apiKey"), params.get("developer"), category, params.get("description"), params.get("serviceClass"), params.get("jarName"), params.get("pageName"));
-            Plugin.storePlugin(plugin, confPath+"/");
-            JSONObject json = new JSONObject();
-			json.element("status", "OK");
-			response.setContentType("application/json; charset=utf-8");		
-			PrintWriter out = response.getWriter();
-			out.print(json);
-			return;
+            Plugin plugin = new Plugin(params.get("pluginName"), params.get("apiKey"), params.get("developer"), category, params.get("description"), params.get("serviceClass"), params.get("jarName"), params.get("pageName"), 1);
+            if (pluginEao.findAvailablePluginByApiKey(plugin.getApiKey()) == null) {
+            	pluginEao.save(plugin);
+            	JSONObject json = new JSONObject();
+    			json.element("status", "OK");
+    			response.setContentType("application/json; charset=utf-8");		
+    			PrintWriter out = response.getWriter();
+    			out.print(json);
+    			return;
+            } else {
+            	JSONObject json = new JSONObject();
+    			json.element("status", "ERROR");
+    			json.element("msg", "apiKey");
+    			response.setContentType("application/json; charset=utf-8");		
+    			PrintWriter out = response.getWriter();
+    			out.print(json);
+    			return;
+            }
         }catch (Exception e) {
             message= "文件上传失败！";
             e.printStackTrace();

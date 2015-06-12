@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,7 +27,9 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XLog;
-import org.pmf.plugin.entity.Plugin;
+import org.pmf.eao.PluginEao;
+import org.pmf.entity.Invoke;
+import org.pmf.entity.Plugin;
 import org.pmf.plugin.service.PluginService;
 
 /**
@@ -34,6 +38,9 @@ import org.pmf.plugin.service.PluginService;
 @WebServlet("/PluginTestServlet")
 public class PluginTestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	@EJB
+	private PluginEao pluginEao;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -75,7 +82,7 @@ public class PluginTestServlet extends HttpServlet {
 		System.out.println("apiKey="+apiKey);
 		
 		String confPath = this.getServletContext().getRealPath("/WEB-INF/conf");
-		Plugin plugin = Plugin.loadPlugin(apiKey, confPath+"/");
+		Plugin plugin = pluginEao.findAvailablePluginByApiKey(apiKey);
 		
 		if (plugin == null) {
 			JSONObject json = new JSONObject();
@@ -199,13 +206,18 @@ public class PluginTestServlet extends HttpServlet {
 				JSONObject json = service.doPluginService(log, params);
 				response.setContentType("application/json; charset=utf-8");
 				PrintWriter out = response.getWriter();
-				out.print(json);
+				out.print(json);				
+				// update plugin
+				plugin.addInvoke(new Invoke(new Date()));
+				pluginEao.update(plugin);
+				return;
 			} else {
 				JSONObject json = new JSONObject();
 				json.element("status", "ERROR");
 				response.setContentType("application/json; charset=utf-8");		
 				PrintWriter out = response.getWriter();
 				out.print(json);
+				return;
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -215,6 +227,7 @@ public class PluginTestServlet extends HttpServlet {
 			response.setContentType("application/json; charset=utf-8");		
 			PrintWriter out = response.getWriter();
 			out.print(json);
+			return;
 		}
 	}
 
