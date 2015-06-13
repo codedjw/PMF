@@ -81,7 +81,7 @@ public class PluginTestServlet extends HttpServlet {
 		String apiKey = request.getParameter("apiKey");
 		System.out.println("apiKey="+apiKey);
 		
-		String confPath = this.getServletContext().getRealPath("/WEB-INF/conf");
+//		String confPath = this.getServletContext().getRealPath("/WEB-INF/conf");
 		Plugin plugin = pluginEao.findAvailablePluginByApiKey(apiKey);
 		
 		if (plugin == null) {

@@ -1,5 +1,7 @@
 package org.pmf.eao;
 
+import java.util.List;
+
 import javax.ejb.Local;
 
 import org.pmf.entity.Plugin;
@@ -8,5 +10,7 @@ import org.pmf.entity.Plugin;
 public interface PluginEao extends Eao {
 	
 	public Plugin findAvailablePluginByApiKey(String apiKey);
+	
+	public List<Plugin> findAllAvailablePlugins();
 
 }

@@ -33,4 +33,16 @@ public class PluginEaoImpl extends EaoImpl implements PluginEao {
 		return null;
 	}
 
+	@Override
+	public List<Plugin> findAllAvailablePlugins() {
+		// TODO Auto-generated method stub
+		List<Plugin> pluginList = getResultList(Plugin.class
+				, "where o.isAvailable > 0"
+				, null);
+		if (pluginList != null && pluginList.size() > 0) {
+			return pluginList;
+		}
+		return null;
+	}
+
 }

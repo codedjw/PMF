@@ -3,9 +3,12 @@ package org.pmf.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale.Category;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,10 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.pmf.eao.InvokeEao;
 import org.pmf.eao.PluginEao;
 import org.pmf.entity.Plugin;
 
@@ -34,6 +39,9 @@ public class PluginMgmServlet extends HttpServlet {
 	
 	@EJB
 	private PluginEao pluginEao;
+	
+	@EJB
+	private InvokeEao invokeEao;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -67,6 +75,9 @@ public class PluginMgmServlet extends HttpServlet {
 		switch (op) {
 			case 0:
 				this.uploadPlugin(request, response);
+				break;
+			case 1:
+				this.queryPlugin(request, response);
 				break;
 			default:
 				break;
@@ -213,6 +224,142 @@ public class PluginMgmServlet extends HttpServlet {
 			out.print(json);
 			return;
         }
+	}
+	
+	private void queryPlugin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		int interval = 7;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		final long MS_IN_DAY = 24*60*60*1000;
+		
+		// get all available plugins;
+		Date now = new Date();
+		now = new Date(now.getTime() + MS_IN_DAY);
+		String nowStr = sdf.format(now);
+		try {
+			now = sdf.parse(nowStr);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Date sevenDaysAgo = new Date(now.getTime() - (interval * MS_IN_DAY));
+		List<Plugin> plugins = pluginEao.findAllAvailablePlugins();
+		List invokeCount = invokeEao.queryInvokeByPlugin();
+		List invokeArea = invokeEao.queryInvokeByPluginByPeriod(sevenDaysAgo, now);
+		response.setContentType("application/json; charset=utf-8");		
+		PrintWriter out = response.getWriter();
+		JSONObject json = new JSONObject();
+		json.element("status", "OK");
+		// deal with invokeArea (available plugin)
+		Map<String, List<Integer>> areas = new HashMap<String, List<Integer>>();
+		if (invokeArea != null & !invokeArea.isEmpty()) {
+			for (int i=0; i<invokeArea.size(); i++) {
+				Object[] row = (Object[]) invokeArea.get(i);
+				Plugin p = (Plugin) row[0];
+				Date t = (Date) row[1];
+				int c = (new Long((long) row[2])).intValue();
+				if (p.getIsAvailable() > 0) {
+					if (!areas.containsKey(p.getPluginName())) {
+						List<Integer> list = new ArrayList<Integer>();
+						for (int j=0; j<interval; j++) {
+							list.add(0);
+						}
+						areas.put(p.getPluginName(), list);
+					}
+					long period = t.getTime() - sevenDaysAgo.getTime();
+					int idx = 0;
+					if (period >= 0) {
+						idx = new Long(period / MS_IN_DAY).intValue();
+					}
+					idx = (idx > (interval-1)) ? (interval-1) : idx;
+					System.out.println("idx:"+idx);
+					int cnt = areas.get(p.getPluginName()).get(idx);
+					cnt += c;
+					areas.get(p.getPluginName()).set(idx, cnt);
+				}
+			}
+		}
+		if (!areas.isEmpty()) {
+			// series
+			JSONArray series = new JSONArray();
+			for (String s : areas.keySet()) {
+				JSONArray inner = new JSONArray();
+				List<Integer> list = areas.get(s);
+				for (int i=0; i<list.size(); i++) {
+					inner.element(list.get(i));
+				}
+				JSONObject item = new JSONObject();
+				item.element("name", s);
+				item.element("data", inner);
+				series.element(item);
+			}
+			// categories
+			JSONArray cats = new JSONArray();
+			for (int i=0; i<interval; i++) {
+				Date tmp = new Date(sevenDaysAgo.getTime()+i*MS_IN_DAY);
+				String tmpStr = sdf.format(tmp);
+				cats.element(tmpStr);
+			}
+			JSONObject areaJson = new JSONObject();
+			areaJson.element("categories", cats);
+			areaJson.element("series", series);
+			json.element("invokeArea", areaJson);
+		}
+		// deal with invokeCount (available plugin)
+		Map<String, Integer> counts = new HashMap<String, Integer>(); 
+		for (int i=0; i<invokeCount.size(); i++) {
+			Object[] row = (Object [])invokeCount.get(i);
+			Plugin p = (Plugin) row[0];
+			int c = (new Long((long) row[1])).intValue();
+			if (p.getIsAvailable() > 0) {
+				counts.put(p.getPluginName(), c);
+			}
+		}
+		if (!counts.isEmpty()) {
+			JSONArray array = new JSONArray();
+			int i = 0;
+			for (String s :counts.keySet()) {
+				if (i != (counts.size()-1)) {
+					JSONArray inner = new JSONArray();
+					inner.element(s);
+					inner.element(counts.get(s));
+					array.element(inner);
+				} else {
+					JSONObject inner = new JSONObject();
+					inner.element("name", s);
+					inner.element("y", counts.get(s));
+					inner.element("sliced", true);
+					inner.element("selected", true);
+					array.element(inner);
+				}
+				i++;
+			}
+			json.element("invokeCount", array);
+		}
+		// deal with available plugin
+		if (plugins != null && !plugins.isEmpty()) {
+			JSONArray array = new JSONArray();
+			// 设置JSON-LIB让其过滤掉引起循环的字段：
+			JsonConfig config = new JsonConfig(); // 建立配置文件
+			config.setIgnoreDefaultExcludes(false); // 设置默认忽略
+			config.setExcludes(new String[] {"pid", "category", "serviceClass", "jarName", "pageName", "isAvailable", "invokes", "users"}); // 设置忽略的key
+			for (int i=0; i<plugins.size(); i++) {
+				Plugin plugin = plugins.get(i);
+				JSONObject j = JSONObject.fromObject(plugin, config);
+				j.element("ID", (i+1));
+				String s = "INVALID";
+				Plugin.Category cat = plugin.getCategory();
+				if (cat.equals(Plugin.Category.CFD)) {
+					s = "Control-flow Discovery";
+				} else if (cat.equals(Plugin.Category.SND)) {
+					s = "Social-network Discovery";
+				}
+				j.element("category", s);
+				array.element(j);
+			}
+			json.element("list", array);
+		}
+		System.out.println(json);
+		out.print(json);
 	}
 
 }

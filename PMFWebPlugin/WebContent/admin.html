@@ -32,9 +32,7 @@
     <body class="skin-blue">
     	<script type="text/javascript">
         $(document).ready(function() {
-        	/* var json = {logid : 0}; */
-        	/* subshow(); */
-        	/* getAlphaResults(json); */
+        	prepare();
         });
 
         </script>
@@ -225,14 +223,14 @@
                             <div class="nav-tabs-custom" id="inspect">
                                 <!-- Tabs within a box -->
                                 <ul class="nav nav-tabs pull-right">
-                                    <li><a href="#invoke-chart" data-toggle="tab">Invoke</a></li>
-                                    <li class="active"><a href="#owned-chart" data-toggle="tab">Owned by USER</a></li>
+                                    <li class="area-chart"><a href="#area-chart" data-toggle="tab">Invoke Frequency</a></li>
+                                    <li class="count-chart"><a href="#count-chart" data-toggle="tab">Invoke Count</a></li>
                                     <li class="pull-left header"><i class="fa fa-bar-chart-o"></i> Inspect</li>
                                 </ul>
                                 <div class="tab-content no-padding">
                                     <!-- Morris chart - Sales -->
-                                    <div class="chart tab-pane" id="invoke-chart" style="position: relative; height: 400px;"></div>
-                                    <div class="chart tab-pane active" id="owned-chart" style="position: relative; height: 400px;"></div>
+                                    <div class="chart tab-pane area-chart" id="area-chart" style="position: relative; height: 400px;"></div>
+                                    <div class="chart tab-pane count-chart" id="count-chart" style="position: relative; height: 400px;"></div>
                                 </div>
                             </div><!-- /.nav-tabs-custom -->
                             
@@ -335,7 +333,7 @@
                                 </div>
                             </div>
                             
-                            <div id="upload" class="box box-info">
+                            <div id="update" class="box box-info">
                                 <div class="box-header">
                                     <i class="fa fa-inbox"></i>
                                     <h3 class="box-title">All Plugins</h3>
@@ -346,19 +344,7 @@
                                 </div>
                                 <div class="box-body">
                                     <div id="list" class="table-responsive">
-                           				<table class='table table-striped'>
-                           					<tr><th>ID</th><th>Plugin Name</th><th>Category</th><th>Action</th></tr>
-                           					<tr><td>1</td><td>Alpha Plus Algorithm</td><td>Control-flow Discovery</td>
-                           						<td><button class="btn btn-info" onclick="update()"><i class="fa fa-pencil"></i> Update</button>
-                                    				<button class="btn btn-warning"><i class="fa fa-warning"></i> Remove</button>
-                                    			</td>
-             								</tr>
-                           					<tr><td>2</td><td>Handover of Work Metrics</td><td>Social-network Discovery</td>
-												<td><button class="btn btn-info" onclick="update()"><i class="fa fa-pencil"></i> Update</button>
-                                    				<button class="btn btn-warning"><i class="fa fa-warning"></i> Remove</button>
-                                    			</td>
-                           					</tr>
-                           				</table>         
+                           				
                             		</div>
                             	</div>
                            </div>
@@ -378,7 +364,7 @@
                 <div class="body bg-gray">
                 	<form id="updateForm">
                         <div class="form-group">
-                             <input type="text" class="form-control" name="plugiNname" placeholder="Plugin Name"/>
+                             <input type="text" class="form-control" name="pluginName" placeholder="Plugin Name"/>
                         </div>
                         <div class="form-group">
                              <input type="text" class="form-control" name="developer" placeholder="Developer"/>
@@ -391,9 +377,8 @@
                         </div>
                     </form>
                 </div>
-                <div class="footer">                  
-                    <button type="button" class="btn bg-light-blue btn-block" onclick="updatePlugin()">Update</button>
-                    <button type="button" class="btn bg-gray btn-block" data-dismiss="modal">Close</button>
+                <div id="updateModalFooter" class="footer">                  
+                    
                 </div>
       		</div><!-- /.modal-content -->
     	</div><!-- /.modal-dialog -->
@@ -435,111 +420,25 @@
         }).disableSelection();
         $(".box-header, .nav-tabs").css("cursor","move");
         
-        $('#invoke-chart').highcharts({
-            chart: {
-                type: 'areaspline'
-            },
-            title: {
-                text: 'Average fruit consumption during one week'
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'left',
-                verticalAlign: 'top',
-                x: 150,
-                y: 100,
-                floating: true,
-                borderWidth: 1,
-                backgroundColor: '#FFFFFF'
-            },
-            xAxis: {
-                categories: [
-                    'Monday',
-                    'Tuesday',
-                    'Wednesday',
-                    'Thursday',
-                    'Friday',
-                    'Saturday',
-                    'Sunday'
-                ]
-            },
-            yAxis: {
-                title: {
-                    text: 'Fruit units'
-                }
-            },
-            tooltip: {
-                shared: true,
-                valueSuffix: ' units'
-            },
-            credits: {
-                enabled: false
-            },
-            plotOptions: {
-                areaspline: {
-                    fillOpacity: 0.5
-                }
-            },
-            series: [{
-                name: 'John',
-                data: [3, 4, 3, 5, 4, 10, 12]
-            }, {
-                name: 'Jane',
-                data: [1, 3, 4, 3, 3, 5, 4]
-            }]
-        });
-        
-        $('#owned-chart').highcharts({
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false
-            },
-            title: {
-                text: 'Plugins Owned by Users'
-            },
-            credits: {
-                enabled: false
-            },
-            tooltip: {
-        	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        color: '#000000',
-                        connectorColor: '#000000',
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                    }
-                }
-            },
-            series: [{
-                type: 'pie',
-                name: 'Owned by Users',
-                data: [
-                    ['Alpha Plus',   45],
-                    {
-                        name: 'Handover of Matrices',
-                        y: 23,
-                        sliced: true,
-                        selected: true
-                    }
-                ]
-            }]
-        });
      	// fix dimensions of chart that was in a hidden element
 		jQuery(document).on( 'shown.bs.tab', 'a[data-toggle="tab"]', function (e) { // on tab selection event
-			var chart0 = $('#invoke-chart').highcharts();
+			var chart0 = $('#area-chart').highcharts();
 	        chart0.reflow();
-	        var char1 = $('#owned-chart').highcharts();
+	        var chart1 = $('#count-chart').highcharts();
 	        chart1.reflow();
 		});
 
-		function update() {
-			$("#updateModal").modal('show');
+		function update(listid) {
+			if (pluginList != null && pluginList != undefined && listid > 0 && listid <= pluginList.length) {
+				var item = pluginList[listid - 1];
+				$("#updateForm input[name=pluginName]").val(item.pluginName);
+				$("#updateForm input[name=category]").val(item.category);
+				$("#updateForm input[name=developer]").val(item.developer);
+				$("#updateForm textarea[name=description]").val(item.description);
+				$("#updateModalFooter").html("<button type=\"button\" class=\"btn bg-light-blue btn-block\" onclick=\"updatePlugin(\'"+item.apiKey+"\')\">Update</button>"
+						+"<button type=\"button\" class=\"btn bg-gray btn-block\" data-dismiss=\"modal\">Close</button>");
+				$("#updateModal").modal('show');
+			}
 		}
 
 
@@ -603,7 +502,164 @@
 			var key = randomString(12);
 			$('#apiKey').val(key);
 		}
-        
+
+		var pluginList;
+
+		function prepare() {
+			$.ajax({
+				url : "PluginMgmServlet?op=1",
+				type : "POST",
+				dataType : "json",
+				contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+				success : function(json) {
+					// send back a json object
+					if (json.status == "OK") {
+						if (json.list == null || json.list == undefined) {
+							$("#update").hide();
+							pluginList = null;
+						} else {
+							$("#update").show();
+							pluginList = json.list;
+							var uploadhtml = "<table class='table table-striped'>";
+							uploadhtml += ("<tr>"+"<th>ID</th>"+"<th>Plugin Name</th>"+"<th>Category</th>"+"<th>Developer</th>"+"<th>Action</th>"+"</tr>");
+							$.each(pluginList, function(idx, plugin){
+								uploadhtml += "<tr>";
+								uploadhtml += ("<td>"+plugin.ID+"</td>");
+								uploadhtml += ("<td>"+plugin.pluginName+"</td>");
+								uploadhtml += ("<td>"+plugin.category+"</td>");
+								uploadhtml += ("<td>"+plugin.developer+"</td>");
+								uploadhtml += ("<td><button class=\"btn btn-info\" onclick=\"update("+plugin.ID+")\"><i class=\"fa fa-pencil\"></i> Update</button>&nbsp;"
+										+"<button class=\"btn btn-warning\" onclick=\"remove(\'"+plugin.apiKey+"\')\"><i class=\"fa fa-warning\"></i> Remove</button>"
+										+"</td>");
+								uploadhtml += "</tr>";
+								});
+							uploadhtml += "</table>";
+							$('#list').html(uploadhtml);
+						}
+						var inspect = false;
+						if (json.invokeCount == null || json.invokeCount == undefined) {
+							$(".count-chart").removeClass("active");
+							$(".count-chart").hide();
+						} else {
+							inspect = true;
+							$(".count-chart").addClass("active");
+							$(".count-chart").show();
+							drawPieChart("count-chart", "Invoke Counts of Plugins", "Invoked by Users", json.invokeCount);
+							$("#inspect").show();
+						}
+						if (json.invokeArea == null || json.invokeArea == undefined) {
+							$(".area-chart").removeClass("active");
+							$(".area-chart").hide();
+						} else {
+							if (inspect == false) {
+								$(".area-chart").addClass("active");
+								$(".area-chart").show();
+							}
+							inspect = true;
+							drawAreaChart("area-chart", "Invoke Frequencies of Plugins", json.invokeArea.categories, "Invoke Frequencies", "", json.invokeArea.series);
+							$("#inspect").show();
+						}
+						if (inspect == false) {
+							$("#inspect").hide();
+						}
+					}
+		 		},
+
+				// code to run if the request fails;
+				// the raw request and status codes are passed to the function
+				error : function(xhr, status, errThrown) {
+					alert("Sorry, there was a problem!");
+					console.log("Error: " + errThrowm);
+					console.log("Status: " + status);
+					console.dir(xhr); 
+				},
+
+				// code to run regardless of success or failure
+				complete :function(xhr, status) {
+					//alert("The request is complete!");
+				}
+			}); 
+		}
+
+		function drawPieChart(divId, titleText, seriesName, dataArray) {
+			var chart = new Highcharts.Chart({
+	            chart: {
+	            	renderTo: divId,
+	                plotBackgroundColor: null,
+	                plotBorderWidth: null,
+	                plotShadow: false
+	            },
+	            title: {
+	                text: titleText
+	            },
+	            credits: {
+	                enabled: false
+	            },
+	            tooltip: {
+	        	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	            },
+	            plotOptions: {
+	                pie: {
+	                    allowPointSelect: true,
+	                    cursor: 'pointer',
+	                    dataLabels: {
+	                        enabled: true,
+	                        color: '#000000',
+	                        connectorColor: '#000000',
+	                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	                    }
+	                }
+	            },
+	            series: [{
+	                type: 'pie',
+	                name: seriesName,
+	                data: dataArray
+	            }]
+	        });
+		}
+
+        function drawAreaChart(divId, titleText, catArray, yTitle, units, seriesData) {
+        	 var chart = new Highcharts.Chart({
+                 chart: {
+                	 renderTo: divId,
+                     type: 'areaspline'
+                 },
+                 title: {
+                     text: titleText
+                 },
+                 legend: {
+                     layout: 'vertical',
+                     align: 'left',
+                     verticalAlign: 'top',
+                     x: 150,
+                     y: 100,
+                     floating: true,
+                     borderWidth: 1,
+                     backgroundColor: '#FFFFFF'
+                 },
+                 xAxis: {
+                     categories: catArray
+                 },
+                 yAxis: {
+                     title: {
+                         text: yTitle
+                     }
+                 },
+                 tooltip: {
+                     shared: true,
+                     valueSuffix: units
+                 },
+                 credits: {
+                     enabled: false
+                 },
+                 plotOptions: {
+                     areaspline: {
+                         fillOpacity: 0.5
+                     }
+                 },
+                 series: seriesData
+             });
+        }
         </script>       
     </body>
 </html>
