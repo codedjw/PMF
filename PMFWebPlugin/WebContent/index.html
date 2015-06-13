@@ -24,8 +24,8 @@
         <link rel="stylesheet" type="text/css" href="new/css/PNShow.css" /> -->
         
         <!-- jQuery 2.0.2 -->
-        <script src="jquery-2.1.0.js"></script><!-- 
-        <script type="text/javascript" src="d3.js"></script>
+        <script src="jquery-2.1.0.js"></script>
+        <!-- <script type="text/javascript" src="d3.js"></script>
         <script type="text/javascript" src="highcharts/highcharts.js"></script>
 		<script type="text/javascript" src="highcharts/highcharts-3d.js"></script>
 		<script type="text/javascript" src="highcharts/modules/exporting.js"></script>
@@ -40,7 +40,110 @@
         	/* var json = {logid : 0}; */
         	/* subshow(); */
         	/* getAlphaResults(json); */
+        	getCatPluginHtmlIdx();
+        	
         });
+
+        function getCatPluginHtmlIdx() {
+        	$.ajax({
+        		url : "PluginMgmServlet?op=4",
+        		type : "POST",
+        		dataType : "json",
+        		contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+        		success : function(json) {
+        			// send back a json object
+        			if (json.status == "OK") {
+        				updateCateTreeIdx(json);
+        			}
+         		},
+
+        		// code to run if the request fails;
+        		// the raw request and status codes are passed to the function
+        		error : function(xhr, status, errThrown) {
+        			alert("Sorry, there was a problem!");
+        			console.log("Error: " + errThrowm);
+        			console.log("Status: " + status);
+        			console.dir(xhr); 
+        		},
+
+        		// code to run regardless of success or failure
+        		complete :function(xhr, status) {
+        			//alert("The request is complete!");
+        		}
+        	}); 
+        }
+
+        function updateCateTreeIdx(json) {
+        	if (json.cateTree == null || json.cateTree == undefined) {
+        		$("#main-sidebar .cate-tree").remove();
+        	} else {
+            	var count = 0;
+            	$(".owned-box").remove();
+        		$.each(json.cateTree, function(idx, cate){
+        			$.each(cate, function(catName, plugins) {
+        				$li_cat = $("<li class=\"treeview cate-tree\">"+
+                    				"<a href=\"javascript:void(0)\">"+
+                    				"<i class=\"fa fa-folder\"></i>"+
+                    				"<span>"+catName+"</span>"+
+                    				"<i class=\"fa fa-angle-left pull-right\"></i>"+
+                					"</a>"+
+                					"</li>");
+        				$ul_cat = $("<ul class=\"treeview-menu\">"+"</ul>");
+        				$.each(plugins, function(iidx, plugin){
+            				count++;
+            				$div_box = $("<div class=\"col-md-4 owned-box\">"+
+            						"                <div class=\"box box-solid box-success\">"+
+            						"                    <div class=\"box-header\">"+
+            						"                        <h3 class=\"box-title\">"+plugin.pluginName+"</h3>"+
+            					/*	"                         <div class=\"box-tools pull-right\">"+
+            						"                            <button class=\"btn btn-success btn-sm\" data-widget=\"collapse\"><i class=\"fa fa-minus\"></i></button>"+
+            						"                        </div>"+ */
+            						"                    </div>"+
+            						"                    <div class=\"box-body\">"+
+            						"                        <p>"+plugin.description+"</p>"+
+            						"                    </div><!-- /.box-body -->"+
+            						"                    <div class=\"box-footer\">"+
+            						"                        <button class=\"btn btn-info\" onclick=\"javascript:window.location.href=\'"+plugin.pageName+"\'\"><i class=\"fa fa-laptop\"></i> Calculate</button>"+
+            						"                    </div><!-- /.box-footer -->"+
+            						"				  </div><!-- /.box -->"+
+									"      </div><!-- /.col -->");
+						    $(".owned-row").append($div_box);
+        					$li_plugin = $("<li><a href=\""+plugin.pageName+"\"><i class=\"fa fa-angle-double-right\"></i>"+plugin.pluginName+"</a></li>");
+        					$ul_cat.append($li_plugin);
+        				});
+        				$li_cat.append($ul_cat);
+        				$("#main-sidebar").append($li_cat);
+        			});
+        		});
+        		$("#count").html(count);
+        		if (count == 0) {
+					$(".owned-ph").hide();
+					$(".owned-row").hide();
+            	} else {
+            		$(".owned-ph").show();
+					$(".owned-row").show();
+                }
+        	}
+        	/* Sidebar tree view VIP!!! */
+            $("#main-sidebar .treeview").tree();
+            /*     
+             * Add collapse and remove events to boxes
+             * Bug....
+             */
+            /* $("[data-widget='collapse']").click(function() {
+            	//Find the box parent        
+                var box = $(this).parents(".box").first();
+                //Find the body and the footer
+                var bf = box.find(".box-body, .box-footer");
+                if (!box.hasClass("collapsed-box")) {
+                    box.addClass("collapsed-box");
+                    bf.slideUp();
+                } else {
+                    box.removeClass("collapsed-box");
+                    bf.slideDown();
+                }
+            }); */
+        }
 
         </script>
         <!-- header logo: style can be found in header.less -->
@@ -117,33 +220,11 @@
                     </form>  -->
                     <!-- /.search form -->
                     <!-- sidebar menu: : style can be found in sidebar.less -->
-                    <ul class="sidebar-menu">
+                    <ul class="sidebar-menu" id="main-sidebar">
                         <li class="active">
                             <a href="index.html">
                                 <i class="fa fa-dashboard"></i> <span>Dashboard</span>
                             </a>
-                        </li>
-                        <li class="treeview">
-                            <a href="javascript:void(0)">
-                                <i class="fa fa-folder"></i>
-                                <span>Control Flows</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <!-- <li><a href="javascript:void(0);" onclick="alphaplus()"><i class="fa fa-angle-double-right"></i> Alpha+ Algorithm</a></li> -->
-                                <li><a href="alphaplus.html"><i class="fa fa-angle-double-right"></i> Alpha+ Algorithm</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="javascript:void(0)">
-                                <i class="fa fa-folder"></i>
-                                <span>Social Networks</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <!-- <li><a href="javascript:void(0);" onclick="how()"><i class="fa fa-angle-double-right"></i> Handover of Work Metrics</a></li> -->
-                                <li><a href="how.html"><i class="fa fa-angle-double-right"></i> Handover of Work Metrics</a></li>
-                            </ul>
                         </li>
                     </ul>
                 </section>
@@ -176,9 +257,7 @@
                             <!-- small box -->
                             <div class="small-box bg-aqua">
                                 <div class="inner">
-                                    <h3>
-                                        2
-                                    </h3>
+                                    <h3 id="count">0</h3>
                                     <p>
                                         Plugins Owned by YOU
                                     </p>
@@ -251,14 +330,14 @@
                     </div><!-- /.row -->
 
                     <!-- Widgets as boxes -->
-                    <h4 class="page-header" id="owned">
+                    <h4 class="page-header owned-ph" id="owned">
                         Plugins Owned by YOU
                         <small>You have already add the following plugins to you workset.</small>
                     </h4>
                     <!-- Solid boxes -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <!-- Default box -->
+                    <div class="row owned-row">
+                        <!-- <div class="col-md-4">
+                            Default box
                             <div class="box box-solid box-success">
                                 <div class="box-header">
                                     <h3 class="box-title">Alpha Plus Algorithm</h3>
@@ -275,16 +354,16 @@
                                         It constructs P/T nets with special properties (workflow nets) from event logs (as might be collected by an ERP system). 
                                         Each transition in the net corresponds to an observed task.
                                     </p>
-                                </div><!-- /.box-body -->
+                                </div>/.box-body
                                 <div class="box-footer">
                                     <button class="btn btn-info" onclick="javascript:window.location.href='alphaplus.html'"><i class="fa fa-laptop"></i> Calculate</button>
                                     <button class="btn btn-warning"><i class="fa fa-warning"></i> Remove</button>
                                 </div>
-                            </div><!-- /.box -->
-                        </div><!-- /.col -->
+                            </div>/.box
+                        </div>/.col
 
                         <div class="col-md-4">
-                            <!-- Primary box -->
+                            Primary box
                             <div class="box box-solid box-primary">
                                 <div class="box-header">
                                     <h3 class="box-title">Social Network Mining (HoW)</h3>
@@ -297,13 +376,13 @@
                                         Find social networks -- Handover of Work from the input log files.<br>
                                         Presented in Social Network Model and HeatMap.
                                     </p>
-                                </div><!-- /.box-body -->
+                                </div>/.box-body
                                 <div class="box-footer">
                                     <button class="btn btn-info" onclick="javascript:window.location.href='how.html'"><i class="fa fa-laptop"></i> Calculate</button>
                                     <button class="btn btn-warning"><i class="fa fa-warning"></i> Remove</button>
                                 </div>
-                            </div><!-- /.box -->
-                        </div><!-- /.col -->
+                            </div>/.box
+                        </div>/.col -->
                     </div><!-- /.row -->
                     <!-- Widgets as boxes -->
                     <h4 class="page-header" id="more">

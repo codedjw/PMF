@@ -370,7 +370,10 @@
                              <input type="text" class="form-control" name="developer" placeholder="Developer"/>
                         </div>
                         <div class="form-group">
-                             <input type="text" class="form-control" name="category" placeholder="Category"/>
+                             <select name="category" class="form-control">
+								<option value="0" selected>Control-flow Discovery</option>
+		  					    <option value="1">Social-network Discovery</option>
+	     					</select>
                         </div>	
                         <div>
                              <textarea class="textarea" placeholder="Description" name="description" style="width: 100%; height: 167px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
@@ -432,7 +435,11 @@
 			if (pluginList != null && pluginList != undefined && listid > 0 && listid <= pluginList.length) {
 				var item = pluginList[listid - 1];
 				$("#updateForm input[name=pluginName]").val(item.pluginName);
-				$("#updateForm input[name=category]").val(item.category);
+				$("#updateForm select[name=category] option").each(function(){
+				   if($(this).text() === item.category){
+					  $(this).attr('selected', 'selected');
+				   }
+			    });
 				$("#updateForm input[name=developer]").val(item.developer);
 				$("#updateForm textarea[name=description]").val(item.description);
 				$("#updateModalFooter").html("<button type=\"button\" class=\"btn bg-light-blue btn-block\" onclick=\"updatePlugin(\'"+item.apiKey+"\')\">Update</button>"
@@ -514,54 +521,7 @@
 				success : function(json) {
 					// send back a json object
 					if (json.status == "OK") {
-						if (json.list == null || json.list == undefined) {
-							$("#update").hide();
-							pluginList = null;
-						} else {
-							$("#update").show();
-							pluginList = json.list;
-							var uploadhtml = "<table class='table table-striped'>";
-							uploadhtml += ("<tr>"+"<th>ID</th>"+"<th>Plugin Name</th>"+"<th>Category</th>"+"<th>Developer</th>"+"<th>Action</th>"+"</tr>");
-							$.each(pluginList, function(idx, plugin){
-								uploadhtml += "<tr>";
-								uploadhtml += ("<td>"+plugin.ID+"</td>");
-								uploadhtml += ("<td>"+plugin.pluginName+"</td>");
-								uploadhtml += ("<td>"+plugin.category+"</td>");
-								uploadhtml += ("<td>"+plugin.developer+"</td>");
-								uploadhtml += ("<td><button class=\"btn btn-info\" onclick=\"update("+plugin.ID+")\"><i class=\"fa fa-pencil\"></i> Update</button>&nbsp;"
-										+"<button class=\"btn btn-warning\" onclick=\"remove(\'"+plugin.apiKey+"\')\"><i class=\"fa fa-warning\"></i> Remove</button>"
-										+"</td>");
-								uploadhtml += "</tr>";
-								});
-							uploadhtml += "</table>";
-							$('#list').html(uploadhtml);
-						}
-						var inspect = false;
-						if (json.invokeCount == null || json.invokeCount == undefined) {
-							$(".count-chart").removeClass("active");
-							$(".count-chart").hide();
-						} else {
-							inspect = true;
-							$(".count-chart").addClass("active");
-							$(".count-chart").show();
-							drawPieChart("count-chart", "Invoke Counts of Plugins", "Invoked by Users", json.invokeCount);
-							$("#inspect").show();
-						}
-						if (json.invokeArea == null || json.invokeArea == undefined) {
-							$(".area-chart").removeClass("active");
-							$(".area-chart").hide();
-						} else {
-							if (inspect == false) {
-								$(".area-chart").addClass("active");
-								$(".area-chart").show();
-							}
-							inspect = true;
-							drawAreaChart("area-chart", "Invoke Frequencies of Plugins", json.invokeArea.categories, "Invoke Frequencies", "", json.invokeArea.series);
-							$("#inspect").show();
-						}
-						if (inspect == false) {
-							$("#inspect").hide();
-						}
+						updatePage(json);
 					}
 		 		},
 
@@ -659,6 +619,126 @@
                  },
                  series: seriesData
              });
+        }
+
+        function removePlugin(apiKey) {
+        	$.ajax({
+				url : "PluginMgmServlet?op=3&apiKey="+apiKey,
+				type : "POST",
+				dataType : "json",
+				contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+				success : function(json) {
+					// send back a json object
+					if (json.status == "OK") {
+						updatePage(json);
+					}
+		 		},
+
+				// code to run if the request fails;
+				// the raw request and status codes are passed to the function
+				error : function(xhr, status, errThrown) {
+					alert("Sorry, there was a problem!");
+					console.log("Error: " + errThrowm);
+					console.log("Status: " + status);
+					console.dir(xhr); 
+				},
+
+				// code to run regardless of success or failure
+				complete :function(xhr, status) {
+					//alert("The request is complete!");
+				}
+			}); 
+        }
+
+        function updatePlugin(apiKey) {
+            var json = {
+						pluginName : $("#updateForm input[name=pluginName]").val(),
+						category : $("#updateForm select[name=category]").val(),
+						developer : $("#updateForm input[name=developer]").val(),
+						description : $("#updateForm textarea[name=description]").val()
+                    };
+            var jsonstr = JSON.stringify(json);
+        	$.ajax({
+				url : "PluginMgmServlet?op=2&apiKey="+apiKey,
+				data : {
+					"updateJson" : jsonstr
+				},
+				type : "POST",
+				dataType : "json",
+				contentType: "application/x-www-form-urlencoded; charset=utf-8", 
+				success : function(json) {
+					// send back a json object
+					if (json.status == "OK") {
+						updatePage(json);
+						$("#updateModal").modal('hide');
+					}
+		 		},
+
+				// code to run if the request fails;
+				// the raw request and status codes are passed to the function
+				error : function(xhr, status, errThrown) {
+					alert("Sorry, there was a problem!");
+					console.log("Error: " + errThrowm);
+					console.log("Status: " + status);
+					console.dir(xhr); 
+				},
+
+				// code to run regardless of success or failure
+				complete :function(xhr, status) {
+					//alert("The request is complete!");
+				}
+			}); 
+        }
+
+        function updatePage(json) {
+        	if (json.list == null || json.list == undefined) {
+				$("#update").hide();
+				pluginList = null;
+			} else {
+				$("#update").show();
+				pluginList = json.list;
+				var uploadhtml = "<table class='table table-striped'>";
+				uploadhtml += ("<tr>"+"<th>ID</th>"+"<th>Plugin Name</th>"+"<th>Category</th>"+"<th>Developer</th>"+"<th>Action</th>"+"</tr>");
+				$.each(pluginList, function(idx, plugin){
+					uploadhtml += "<tr>";
+					uploadhtml += ("<td>"+plugin.ID+"</td>");
+					uploadhtml += ("<td>"+plugin.pluginName+"</td>");
+					uploadhtml += ("<td>"+plugin.category+"</td>");
+					uploadhtml += ("<td>"+plugin.developer+"</td>");
+					uploadhtml += ("<td><button class=\"btn btn-info\" onclick=\"update("+plugin.ID+")\"><i class=\"fa fa-pencil\"></i> Update</button>&nbsp;"
+							+"<button class=\"btn btn-warning\" onclick=\"removePlugin(\'"+plugin.apiKey+"\')\"><i class=\"fa fa-warning\"></i> Remove</button>"
+							+"</td>");
+					uploadhtml += "</tr>";
+					});
+				uploadhtml += "</table>";
+				$('#list').html(uploadhtml);
+			}
+			var inspect = false;
+			if (json.invokeCount == null || json.invokeCount == undefined) {
+				$(".count-chart").removeClass("active");
+				$(".count-chart").hide();
+			} else {
+				inspect = true;
+				$(".count-chart").addClass("active");
+				$(".count-chart").show();
+				drawPieChart("count-chart", "Invoke Counts of Plugins", "Invoked by Users", json.invokeCount);
+				$("#inspect").show();
+			}
+			if (json.invokeArea == null || json.invokeArea == undefined) {
+				$(".area-chart").removeClass("active");
+				$(".area-chart").hide();
+			} else {
+				if (inspect == false) {
+					$(".area-chart").addClass("active");
+					$(".area-chart").show();
+				}
+				inspect = true;
+				drawAreaChart("area-chart", "Invoke Frequencies of Plugins", json.invokeArea.categories, "Invoke Frequencies", "", json.invokeArea.series);
+				$("#inspect").show();
+			}
+			if (inspect == false) {
+				$("#inspect").hide();
+			}
         }
         </script>       
     </body>

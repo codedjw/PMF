@@ -38,6 +38,7 @@
     <body class="skin-blue">
     	<script type="text/javascript">
         $(document).ready(function() {
+        	getCatPluginHtml();
         	$("#fileChooser").modal('show');
         });
 
@@ -168,33 +169,11 @@
                     </form>  -->
                     <!-- /.search form -->
                     <!-- sidebar menu: : style can be found in sidebar.less -->
-                    <ul class="sidebar-menu">
+                    <ul class="sidebar-menu" id="main-sidebar">
                         <li class="active">
                             <a href="index.html">
                                 <i class="fa fa-dashboard"></i> <span>Dashboard</span>
                             </a>
-                        </li>
-                        <li class="treeview">
-                            <a href="javascript:void(0)">
-                                <i class="fa fa-folder"></i>
-                                <span>Control Flows</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <!-- <li><a href="javascript:void(0);" onclick="alphaplus()"><i class="fa fa-angle-double-right"></i> Alpha+ Algorithm</a></li> -->
-                                <li><a href="alphaplus.html" ><i class="fa fa-angle-double-right"></i> Alpha+ Algorithm</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="javascript:void(0)">
-                                <i class="fa fa-folder"></i>
-                                <span>Social Networks</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <!-- <li><a href="javascript:void(0);" onclick="how()"><i class="fa fa-angle-double-right"></i> Handover of Work Metrics</a></li> -->
-                                <li><a href="how.html"><i class="fa fa-angle-double-right"></i> Handover of Work Metrics</a></li>
-                            </ul>
                         </li>
                     </ul>
                 </section>

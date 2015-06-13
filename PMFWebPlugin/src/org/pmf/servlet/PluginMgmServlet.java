@@ -8,8 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ejb.EJB;
@@ -78,6 +80,15 @@ public class PluginMgmServlet extends HttpServlet {
 				break;
 			case 1:
 				this.queryPlugin(request, response);
+				break;
+			case 2:
+				this.updatePluginByApiKey(request, response);
+				break;
+			case 3:
+				this.removePluginByApiKey(request, response);
+				break;
+			case 4:
+				this.queryPluginHtml(request, response);
 				break;
 			default:
 				break;
@@ -208,11 +219,7 @@ public class PluginMgmServlet extends HttpServlet {
             Plugin.Category category = Plugin.Category.values()[Integer.parseInt(params.get("category"))];
             Plugin plugin = new Plugin(params.get("pluginName"), params.get("apiKey"), params.get("developer"), category, params.get("description"), params.get("serviceClass"), params.get("jarName"), params.get("pageName"), 1);
             pluginEao.save(plugin);
-        	JSONObject json = new JSONObject();
-			json.element("status", "OK");
-			response.setContentType("application/json; charset=utf-8");		
-			PrintWriter out = response.getWriter();
-			out.print(json);
+        	this.queryPlugin(request, response);
 			return;
         }catch (Exception e) {
             message= "文件上传失败！";
@@ -348,15 +355,84 @@ public class PluginMgmServlet extends HttpServlet {
 				j.element("ID", (i+1));
 				String s = "INVALID";
 				Plugin.Category cat = plugin.getCategory();
-				if (cat.equals(Plugin.Category.CFD)) {
-					s = "Control-flow Discovery";
-				} else if (cat.equals(Plugin.Category.SND)) {
-					s = "Social-network Discovery";
-				}
+				s = Plugin.cateNames[cat.ordinal()];
 				j.element("category", s);
 				array.element(j);
 			}
 			json.element("list", array);
+		}
+		System.out.println(json);
+		out.print(json);
+	}
+	
+	private void removePluginByApiKey(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String apiKey =  request.getParameter("apiKey");
+		Plugin plugin = pluginEao.findAvailablePluginByApiKey(apiKey);
+		if (plugin != null) {
+			plugin.setIsAvailable(0);
+			pluginEao.update(plugin);
+		}
+		this.queryPlugin(request, response);
+	}
+	
+	private void updatePluginByApiKey(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String apiKey =  request.getParameter("apiKey");
+		Plugin plugin = pluginEao.findAvailablePluginByApiKey(apiKey);
+		if (plugin == null) {
+			JSONObject json = new JSONObject();
+			json.element("status", "ERROR");
+			response.setContentType("application/json; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			out.print(json);
+			return;
+		}
+		String updateJsonStr = request.getParameter("updateJson");
+		JSONObject updateJson = JSONObject.fromObject(updateJsonStr);
+		String pluginName = updateJson.getString("pluginName");
+		Plugin.Category category = Plugin.Category.values()[Integer.parseInt(updateJson.getString("category"))];
+		String developer = updateJson.getString("developer");
+		String description = updateJson.getString("description");
+		plugin.setPluginName(pluginName);
+		plugin.setCategory(category);
+		plugin.setDeveloper(developer);
+		plugin.setDescription(description);
+		pluginEao.update(plugin);
+		this.queryPlugin(request, response);
+	}
+	
+	private void queryPluginHtml(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		List<Plugin> plugins = pluginEao.findAllAvailablePlugins();
+		response.setContentType("application/json; charset=utf-8");		
+		PrintWriter out = response.getWriter();
+		JSONObject json = new JSONObject();
+		json.element("status", "OK");
+		if (plugins != null && !plugins.isEmpty()) {
+			Map<Plugin.Category, Set<Plugin>> catPlugin = new HashMap<Plugin.Category, Set<Plugin>>();
+			for (Plugin plugin : plugins) {
+				if (!catPlugin.containsKey(plugin.getCategory())) {
+					Set<Plugin> set = new HashSet<Plugin>();
+					catPlugin.put(plugin.getCategory(), set);
+				}
+				catPlugin.get(plugin.getCategory()).add(plugin);
+			}
+			if (!catPlugin.isEmpty()) {
+				JSONArray array = new JSONArray();
+				for(Plugin.Category cat : catPlugin.keySet()) {
+					Set<Plugin> set = catPlugin.get(cat);
+					JSONObject jso = new JSONObject();
+					JSONArray inner = new JSONArray();
+					for (Plugin p : set) {
+						JSONObject j = new JSONObject();
+						j.element("pluginName", p.getPluginName());
+						j.element("description", p.getDescription());
+						j.element("pageName", p.getPageName());
+						inner.element(j);
+					}
+					jso.element(Plugin.cateNamesInShort[cat.ordinal()], inner);
+					array.element(jso);
+				}
+				json.element("cateTree", array);
+			}
 		}
 		System.out.println(json);
 		out.print(json);
