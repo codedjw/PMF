@@ -481,6 +481,7 @@
 				if (json.status == "OK") {
 					$("#awarning").hide();
 					$("#reset").click();
+					updatePage(json);
     			} else if(json.status == "ERROR") {
         			$.each(json.msgs, function(i, msg){
 						$.each(msg, function(key, value) {

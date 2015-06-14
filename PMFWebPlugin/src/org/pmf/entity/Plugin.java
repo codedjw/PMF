@@ -52,7 +52,7 @@ public class Plugin {
 	@Column(nullable=false)
 	private Category category;
 	
-	@Column(nullable=false)
+	@Column(nullable=false, length=10000)
 	private String description;
 	
 	@Column(nullable=false)
