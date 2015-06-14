@@ -74,10 +74,10 @@
         }
 
         function updateCateTreeIdx(json) {
+        	var count = 0;
         	if (json.cateTree == null || json.cateTree == undefined) {
         		$("#main-sidebar .cate-tree").remove();
         	} else {
-            	var count = 0;
             	$(".owned-box").remove();
         		$.each(json.cateTree, function(idx, cate){
         			$.each(cate, function(catName, plugins) {
@@ -115,15 +115,15 @@
         				$("#main-sidebar").append($li_cat);
         			});
         		});
-        		$("#count").html(count);
-        		if (count == 0) {
-					$(".owned-ph").hide();
-					$(".owned-row").hide();
-            	} else {
-            		$(".owned-ph").show();
-					$(".owned-row").show();
-                }
         	}
+        	$("#count").html(count);
+    		if (count == 0) {
+				$(".owned-ph").hide();
+				$(".owned-row").hide();
+        	} else {
+        		$(".owned-ph").show();
+				$(".owned-row").show();
+            }
         	/* Sidebar tree view VIP!!! */
             $("#main-sidebar .treeview").tree();
             /*     
@@ -332,7 +332,7 @@
                     <!-- Widgets as boxes -->
                     <h4 class="page-header owned-ph" id="owned">
                         Plugins Owned by YOU
-                        <small>You have already add the following plugins to you workset.</small>
+                        <small>You have already add the following plugins to you work set.</small>
                     </h4>
                     <!-- Solid boxes -->
                     <div class="row owned-row">
