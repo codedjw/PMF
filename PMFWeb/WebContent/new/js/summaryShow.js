@@ -112,9 +112,10 @@ function showChart (divId, titleText, xCat, yTitleText, seriesName, seriesData, 
 	});
 }
 
-function showResultInTbl() {
+function showResultInTbl(classifier) {
+	if (classifier == null || classifier == undefined) classifier = "";
 	var loghtml = "<table class='table table-striped'>";
-	loghtml += ("<tr>"+"<th>Event Classes</th>"+"<th>Frequencies</th>"+"</tr>");
+	loghtml += ("<tr>"+"<th>Event Classes"+classifier+"</th>"+"<th>Frequencies</th>"+"</tr>");
 	$.each(logResult, function(idx, logitem){
 		loghtml += "<tr>";
 		loghtml += ("<td>"+logitem.EventClass+"</td>");
@@ -125,22 +126,24 @@ function showResultInTbl() {
 	$('#logsummary').html(loghtml);
 }
 
-function showResultIn3DC() {
+function showResultIn3DC(classifier) {
+	if (classifier == null || classifier == undefined) classifier = "";
 //	destroyHChart('line-chart');
 	var eventClasses = [], frequencies = [];
 	$.each(logResult, function(idx, logitem){
 		eventClasses.push(logitem.EventClass);
 		frequencies.push(logitem.Frequency);
 	});
-	show3DChart('3d-chart', 'Frequencies of Event Classes', eventClasses, 'Frequency', 'Event Class', frequencies, '');
+	show3DChart('3d-chart', 'Frequencies of Event Classes'+classifier, eventClasses, 'Frequency', 'Event Class', frequencies, '');
 }
 
-function showResultInLC() {
+function showResultInLC(classifier) {
+	if (classifier == null || classifier == undefined) classifier = "";
 //	destroyHChart('3d-chart');
 	var eventClasses = [], frequencies = [];
 	$.each(logResult, function(idx, logitem){
 		eventClasses.push(logitem.EventClass);
 		frequencies.push(logitem.Frequency);
 	});
-	showChart('line-chart', 'Frequencies of Event Classes', eventClasses, 'Frequency', 'Event Class', frequencies, '');
+	showChart('line-chart', 'Frequencies of Event Classes'+classifier, eventClasses, 'Frequency', 'Event Class', frequencies, '');
 }
